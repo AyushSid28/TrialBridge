@@ -1,46 +1,65 @@
 # TrialBridge
 
-**AI-powered clinical trial patient-matching platform.**
+TrialBridge helps match patients to clinical trials using eligibility rules instead of going through records by hand.
 
-TrialBridge scrapes clinical trials from [ClinicalTrials.gov](https://clinicaltrials.gov), imports patient records, and uses LLM-based agents to score and rank patients against trial eligibility criteria — helping researchers find the right patients faster.
+It stores trial listings from public registries (US NCT / ClinicalTrials.gov and EU EudraCT) alongside patient records (conditions, ICD-10 codes, demographics). A set of agents then finds likely candidates and ranks them with a short explanation of why they fit or were excluded.
 
-## ✨ Features
+This is a screening helper for recruitment — not a diagnosis or treatment tool.
 
--  **Trial Search** — Browse and search recruiting US clinical trials by condition, keyword, or NCT ID
--  **AI Matching** — LLM-powered orchestrator chains Text-to-SQL, root-word search, and demographic filters
--  **Patient Scoring** — Multi-factor eligibility scoring (condition, age, sex, geography, health) with ICD-10 mapping
--  **Natural Language Criteria** — Describe patient requirements in plain English and let the AI handle the rest
--  **Analytics Dashboard** — Streamlit UI with score distributions, radar charts, and patient inspector
--  **Docker Ready** — Multi-stage Dockerfile for production deployment
+## What it does
 
-##  Tech Stack
+- Search and browse trials by condition, title, or NCT ID
+- Ask questions in plain English against the patient database
+- Match patients to a trial (or to typed criteria)
+- Score and rank candidates from 0–100 (condition, age, sex, geography, health)
+
+## How the agents work
+
+The usual path is a pipeline, not a single model:
+
+1. **Text-to-SQL** — first cut: turn trial rules or a question into a database query
+2. **Root word search** — second cut: match diagnoses even when the wording differs, plus age / sex / location filters
+3. **Orchestrator** — loads a trial or free-text criteria and runs the two steps above
+4. **Scoring** — ranks the remaining patients and flags exclusion criteria
+
+You can also run each agent on its own from the API or the Streamlit UI. See [AGENTS_README.md](AGENTS_README.md) for how to try them.
+
+## Tech stack
 
 | Layer | Technology |
 |-------|------------|
-| **Backend** | FastAPI, Python 3.11+ |
-| **Database** | PostgreSQL, SQLAlchemy (async), Alembic |
-| **AI/LLM** | OpenAI, Groq (via OpenRouter) |
-| **Dashboard** | Streamlit, Plotly, Matplotlib |
-| **Infra** | Docker, Gunicorn, Logfire |
+| Backend | FastAPI, Python 3.11+ |
+| Database | PostgreSQL, SQLAlchemy (async), Alembic |
+| LLM | OpenRouter (`gpt-4o-mini`), optional Groq |
+| Dashboard | Streamlit, Plotly |
+| Infra | Docker, Gunicorn |
 
-##  Prerequisites
+## Prerequisites
 
-- Python 3.11+
+- Python 3.11 or newer
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - PostgreSQL
 
-##  Quick Start
-
-### Local
+## Quick start
 
 ```bash
 uv sync
 cp .env.example .env
+# set DATABASE_URL, SECRET_KEY, API_KEY, OPENROUTER_API_KEY
+
 uv run alembic upgrade head
 uv run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-API docs → [http://localhost:8000/docs](http://localhost:8000/docs)
+API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+Streamlit UI:
+
+```bash
+uv run streamlit run streamlit_app.py
+```
+
+Opens at [http://localhost:8501](http://localhost:8501)
 
 ### Docker
 
@@ -50,25 +69,33 @@ docker compose build
 docker compose up api
 ```
 
-The API listens on port **8000**.
+The API listens on port **8000**. Make sure `DATABASE_URL` is reachable from the container.
 
-##  Project Structure
+## Project layout
 
 | Path | Purpose |
 |------|---------|
-| `src/main.py` | FastAPI application entry |
-| `src/api/` | REST API routes |
-| `src/agents/` | LLM agents — scoring, matching, text-to-SQL |
-| `src/db/` | SQLAlchemy models and async session |
-| `src/scrappers/` | ClinicalTrials.gov scraper, Kaggle patient importer |
-| `src/schemas/` | Pydantic request/response schemas |
-| `src/services/` | Pipeline caching and rate limiting |
-| `src/core/` | Settings and logging |
-| `streamlit_app.py` | Analytics dashboard |
-| `migrations/` | Alembic migration scripts |
+| `src/main.py` | FastAPI entry |
+| `src/api/` | REST routes (`/api/v1/agents/...`) |
+| `src/agents/` | Text-to-SQL, root word search, orchestrator, scoring |
+| `src/db/` | SQLAlchemy models and session |
+| `src/scrappers/` | Trial scrapers and patient import |
+| `src/schemas/` | Pydantic request/response models |
+| `src/services/` | Pipeline cache and rate limiting |
+| `streamlit_app.py` | Dashboard for matching and scoring |
+| `migrations/` | Alembic migrations |
 | `tests/` | Pytest suite |
 
-##  Development
+## Configuration
+
+Copy `.env.example` to `.env` and set:
+
+- `DATABASE_URL` — PostgreSQL connection string
+- `SECRET_KEY` — application signing key
+- `API_KEY` — value for the `X-API-Key` header
+- `OPENROUTER_API_KEY` / `GROQ_API_KEY` — LLM keys
+
+## Development
 
 ```bash
 uv run pytest
@@ -77,17 +104,8 @@ uv run black .
 uv run alembic revision --autogenerate -m "describe change"
 ```
 
-##  Configuration
-
-Copy `.env.example` to `.env` and set:
-
-- `DATABASE_URL` — PostgreSQL connection string
-- `SECRET_KEY` — Application signing key
-- `API_KEY` — API authentication key
-- `OPENROUTER_API_KEY` / `GROQ_API_KEY` — LLM provider keys
-
-##  Production
+## Production notes
 
 - Set `DEBUG=False` and use a strong `SECRET_KEY`
 - Run behind a reverse proxy with TLS
-- Use `uv sync --frozen` in CI/Docker
+- Prefer `uv sync --frozen` in CI/Docker
