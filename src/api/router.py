@@ -21,7 +21,12 @@ router.include_router(
 @router.get("/")
 async def root() -> dict[str, str]:
     logger.info("Root endpoint accessed")
-    return {"message": "Hello World"}
+    return {
+        "name": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "docs": "/docs",
+        "health": "/health",
+    }
 
 
 @router.get("/health")

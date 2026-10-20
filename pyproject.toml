@@ -1,7 +1,7 @@
 [project]
-name = "ulalo-backend"
+name = "trialbridge"
 version = "0.1.0"
-description = "Ulalo Backend"
+description = "TrialBridge — match patients to clinical trials"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
