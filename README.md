@@ -116,6 +116,8 @@ uv run black .
 uv run alembic revision --autogenerate -m "describe change"
 ```
 
+Pull requests and branch pushes run `.github/workflows/ci.yml` (unit tests plus model tests against Postgres).
+
 ## Production notes
 
 - Set `DEBUG=False` and use a strong `SECRET_KEY`
