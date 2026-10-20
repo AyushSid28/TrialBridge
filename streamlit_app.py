@@ -5,6 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 
 API_BASE = "http://localhost:8001/api/v1/agents"
@@ -482,6 +483,8 @@ if score_btn:
             header_parts.append(f'<span class="tag teal">{nct}</span>')
         if status:
             header_parts.append(f'<span class="tag">{status}</span>')
+        run_time = datetime.now().strftime("%b %d, %Y  %H:%M")
+        header_parts.append(f'<span class="tag warm">⏱ {run_time}</span>')
         st.markdown(f'## {title}', unsafe_allow_html=True)
         if header_parts:
             st.markdown(" ".join(header_parts), unsafe_allow_html=True)
