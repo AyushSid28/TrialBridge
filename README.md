@@ -65,11 +65,23 @@ Opens at [http://localhost:8501](http://localhost:8501)
 
 ```bash
 cp .env.example .env
-docker compose build
-docker compose up api
+# set SECRET_KEY, API_KEY, and at least one LLM key in .env
+docker compose up --build
 ```
 
-The API listens on port **8000**. Make sure `DATABASE_URL` is reachable from the container.
+This starts Postgres on port **5432** and the API on port **8000**. The API container is pointed at the `db` service automatically, so you do not need to change `DATABASE_URL` in `.env` for Docker.
+
+After the database is up, apply migrations once:
+
+```bash
+docker compose exec api alembic upgrade head
+```
+
+Or from the host (with `DATABASE_URL` pointing at `localhost:5432`):
+
+```bash
+uv run alembic upgrade head
+```
 
 ## Project layout
 
