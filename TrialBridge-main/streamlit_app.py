@@ -380,6 +380,31 @@ def detail_grid(items: list[tuple[str, str]]):
     st.markdown(f'<div class="detail-grid">{inner}</div>', unsafe_allow_html=True)
 
 
+# ── Sidebar ───────────────────────────────────────────────────────────────
+
+with st.sidebar:
+    st.markdown(f"""
+    <div style="padding: 0.5rem 0 1rem 0;">
+        <span style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; color: {_TEXT};">Ulalo</span>
+        <span style="display: inline-block; margin-left: 0.5rem; padding: 0.1rem 0.45rem; border-radius: 4px;
+                      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em;
+                      background: rgba(90,158,148,0.15); color: {_ACCENT}; border: 1px solid rgba(90,158,148,0.3);">
+            v1.0
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.82rem; line-height:1.5;">Clinical trial patient screening &amp; ranking powered by multi-agent AI pipelines.</span>', unsafe_allow_html=True)
+    st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
+    data_source = st.radio("Data source", ["Kaggle (4K patients)", "FHIR (117 patients)"], key="data_source")
+    source_val = "fhir" if "FHIR" in data_source else "kaggle"
+    st.markdown(f"""
+    <div style="margin-top: 2rem; padding: 0.8rem; background: {_SURFACE}; border: 1px solid {_BORDER};
+                border-radius: 8px; font-size: 0.72rem; color: {_TEXT_DIM}; line-height: 1.6;">
+        <strong style="color:{_TEXT};">About</strong><br>
+        TrialBridge matches patients to clinical trials using eligibility rules. Select a trial or describe criteria in plain language to score and rank candidates.
+    </div>
+    """, unsafe_allow_html=True)
+
 # ── Page ─────────────────────────────────────────────────────────────────
 
 st.markdown("# Ulalo")
@@ -388,10 +413,7 @@ st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 
 # ── Input ────────────────────────────────────────────────────────────────
 
-src_col, mode_col = st.columns([1, 2])
-with src_col:
-    data_source = st.radio("Data source", ["Kaggle (4K patients)", "FHIR (117 patients)"], horizontal=True, key="data_source")
-    source_val = "fhir" if "FHIR" in data_source else "kaggle"
+mode_col = st.columns([1])[0]
 with mode_col:
     input_mode = st.radio("Input mode", ["Select Trial", "Custom Input"], horizontal=True, key="score_mode")
 
