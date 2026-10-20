@@ -440,6 +440,25 @@ score_btn = st.button("Run Scoring", type="primary", key="score_btn", use_contai
 
 # ── Results ──────────────────────────────────────────────────────────────
 
+if not score_btn:
+    st.markdown(f"""
+    <div style="margin: 3rem auto; max-width: 520px; text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🔬</div>
+        <div style="font-size: 1.1rem; font-weight: 600; color: {_TEXT}; margin-bottom: 0.5rem;">
+            Ready to screen patients
+        </div>
+        <div style="font-size: 0.85rem; color: {_TEXT_DIM}; line-height: 1.6; margin-bottom: 1.5rem;">
+            Select a clinical trial or describe your criteria above, then hit
+            <strong style="color:{_ACCENT};">Run Scoring</strong> to match and rank patients.
+        </div>
+        <div style="display: flex; justify-content: center; gap: 2rem; font-size: 0.75rem; color: {_TEXT_DIM};">
+            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">1️⃣</span>Choose input</div>
+            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">2️⃣</span>Set criteria</div>
+            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">3️⃣</span>Run scoring</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
 if score_btn:
     data = None
     if input_mode == "Select Trial" and score_trial_id:
