@@ -396,7 +396,12 @@ with st.sidebar:
     """, unsafe_allow_html=True)
     st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.82rem; line-height:1.5;">Clinical trial patient screening &amp; ranking powered by multi-agent AI pipelines.</span>', unsafe_allow_html=True)
     st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
-    data_source = st.radio("Data source", ["Kaggle (4K patients)", "FHIR (117 patients)"], key="data_source")
+    data_source = st.radio(
+        "Data source",
+        ["Kaggle (4K patients)", "FHIR (117 patients)"],
+        key="data_source",
+        help="Choose the patient dataset used for screening: Kaggle contains about 4,000 patients, while FHIR contains 117 patients.",
+    )
     source_val = "fhir" if "FHIR" in data_source else "kaggle"
     st.markdown(f"""
     <div style="margin-top: 2rem; padding: 0.8rem; background: {_SURFACE}; border: 1px solid {_BORDER};
@@ -416,7 +421,13 @@ st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 
 mode_col = st.columns([1])[0]
 with mode_col:
-    input_mode = st.radio("Input mode", ["Select Trial", "Custom Input"], horizontal=True, key="score_mode")
+    input_mode = st.radio(
+        "Input mode",
+        ["Select Trial", "Custom Input"],
+        horizontal=True,
+        key="score_mode",
+        help="Select a listed clinical trial, or describe patient eligibility criteria in plain language.",
+    )
 
 if input_mode == "Select Trial":
     oc1, oc2 = st.columns([3, 1])
@@ -425,17 +436,27 @@ if input_mode == "Select Trial":
         options=list(TRIAL_OPTIONS.keys()),
         index=DEFAULT_TRIAL_IDX,
         key="score_trial_select",
+        help="Choose the clinical trial whose eligibility criteria will be used to score and rank patients.",
     )
     score_trial_id = TRIAL_OPTIONS.get(label, "")
-    score_limit = oc2.slider("Max patients", 10, 500, 200, key="score_limit")
+    score_limit = oc2.slider(
+        "Max patients", 10, 500, 200,
+        key="score_limit",
+        help="Set the maximum number of patients to score for the selected trial. Higher limits may take longer.",
+    )
 else:
     search_query = st.text_area(
         "Describe patient criteria in plain language",
         placeholder="e.g. elderly women with heart problems and high BMI, diabetic patients over 50...",
         height=100,
         key="score_query",
+        help="Describe the target patients, including relevant conditions, age, sex, BMI, smoking status, or other eligibility requirements.",
     )
-    score_limit = st.slider("Max patients", 10, 500, 200, key="score_limit_crit")
+    score_limit = st.slider(
+        "Max patients", 10, 500, 200,
+        key="score_limit_crit",
+        help="Set the maximum number of patients to score against your custom criteria. Higher limits may take longer.",
+    )
 
 score_btn = st.button("Run Scoring", type="primary", key="score_btn", use_container_width=False)
 
