@@ -179,31 +179,27 @@ async def match_patients_by_criteria(request: CriteriaMatchRequest, session: DBS
 
 
 
-@router.post("/score-patients",response_model=ScorePatientResponse)
-async def score_patients(request:ScorePatientRequest,session:DBSession):
-    """Score and rank maatched patients by relevance to a critical trial.
-    
-    Runs the orchestrator to get matched patients,then applies multifactor weighted
-    scoring (condition overlap,age,sex,geography,health metrics)
-    and exclusion criteria.Returns patients ranked 0-100 with per-factor breakdown.
+@router.post("/score-patients", response_model=ScorePatientResponse)
+async def score_patients(request: ScorePatientRequest, session: DBSession):
+    """Score and rank matched patients by relevance to a clinical trial.
 
-    
-    
+    Runs the orchestrator to get matched patients, then applies multifactor weighted
+    scoring (condition overlap, age, sex, geography, health metrics)
+    and exclusion criteria. Returns patients ranked 0–100 with per-factor breakdown.
     """
     try:
-        agent=ScoringAgent(session)
-        result=await agent.run(
+        agent = ScoringAgent(session)
+        result = await agent.run(
             trial_id=request.trial_id,
             limit=request.limit,
             source=request.source,
         )
         return result
     except ValueError as e:
-        raise HTTPException(status_code=400,detail=str(e))
-
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error("Scoring agent failed",exc_info=True)
-        raise HTTPException(status_code=500,detail=f"Scoring error:{str(e)}")
+        logger.error("Scoring agent failed", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Scoring error: {str(e)}")
 
 
 @router.post("/score-patients-criteria", response_model=ScorePatientResponse)
