@@ -610,6 +610,14 @@ if score_btn:
                     ),
                     use_container_width=True, height=450,
                 )
+                csv_data = df.to_csv(index=False).encode("utf-8")
+                st.download_button(
+                    label="📥 Export eligible patients (CSV)",
+                    data=csv_data,
+                    file_name="eligible_patients.csv",
+                    mime="text/csv",
+                    key="download_csv",
+                )
             else:
                 st.info("No eligible patients.")
         with t_excl:
