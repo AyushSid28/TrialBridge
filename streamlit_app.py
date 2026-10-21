@@ -620,7 +620,7 @@ if score_btn:
             st.markdown("### Patient Inspector")
 
             opts = {
-                f"#{i+1}  {p.get('display_patient_id', p['patient_id'][:8])}  ({p['composite_score']})": p
+                f"#{i+1}  {p.get('display_patient_id') or p['patient_id'][:8]}  ({p['composite_score']})": p
                 for i, p in enumerate(eligible_patients)
             }
             sel = opts[st.selectbox("Select patient", list(opts.keys()), key="score_patient_sel")]
