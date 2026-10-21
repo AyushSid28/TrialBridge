@@ -318,6 +318,14 @@ def api_post(endpoint: str, payload: dict, timeout: int = 120) -> dict | None:
         resp = requests.post(f"{API_BASE}/{endpoint}", json=payload, headers=API_HEADERS, timeout=timeout)
         if resp.status_code == 200:
             return resp.json()
+        if resp.status_code == 429:
+            retry_after = resp.headers.get("Retry-After", "")
+            wait = f" Try again in {retry_after}s." if retry_after else ""
+            st.warning(f"Rate limited by the API.{wait}")
+            return None
+        if resp.status_code == 401:
+            st.error("API rejected the key (401). Check that API_KEY matches the backend.")
+            return None
         st.error(f"API {resp.status_code}: {_error_detail(resp)}")
     except requests.exceptions.ConnectionError:
         st.error(f"Cannot connect to backend at {API_URL}. Is uvicorn running?")
