@@ -12,7 +12,7 @@ API_BASE = f"{API_URL}/api/v1/agents"
 API_KEY = os.getenv("API_KEY", "")
 API_HEADERS = {"X-API-Key": API_KEY}
 
-st.set_page_config(page_title="Ulalo", layout="wide", page_icon="U")
+st.set_page_config(page_title="TrialBridge", layout="wide", page_icon="T")
 
 # ── Palette ──────────────────────────────────────────────────────────────
 _BG         = "#0C1117"
@@ -412,7 +412,7 @@ if not API_KEY:
         "expects, otherwise every request is rejected with 401."
     )
 
-st.markdown("# Ulalo")
+st.markdown("# TrialBridge")
 st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.85rem;">Patient screening for clinical trials</span>', unsafe_allow_html=True)
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 
