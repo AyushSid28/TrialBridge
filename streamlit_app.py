@@ -9,7 +9,7 @@ from pathlib import Path
 
 API_URL = os.getenv("TRIALBRIDGE_API_URL", "http://localhost:8000").rstrip("/")
 API_BASE = f"{API_URL}/api/v1/agents"
-API_KEY = os.getenv("API_KEY", "I1yRx5ycm2uwuYR6RcNgm9HeGxiNctSe")
+API_KEY = os.getenv("API_KEY", "")
 API_HEADERS = {"X-API-Key": API_KEY}
 
 st.set_page_config(page_title="Ulalo", layout="wide", page_icon="U")
@@ -382,6 +382,12 @@ def detail_grid(items: list[tuple[str, str]]):
 
 
 # ── Page ─────────────────────────────────────────────────────────────────
+
+if not API_KEY:
+    st.warning(
+        "No API_KEY is set. Export API_KEY to match the value the backend "
+        "expects, otherwise every request is rejected with 401."
+    )
 
 st.markdown("# Ulalo")
 st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.85rem;">Patient screening for clinical trials</span>', unsafe_allow_html=True)
