@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import html
 import json
 import os
 from pathlib import Path
@@ -340,7 +341,10 @@ def stat_row(cells: list[tuple[str, str, str]]):
     """Render a row of stat cells. Each tuple: (value, label, color_class)."""
     inner = ""
     for val, label, cls in cells:
-        inner += f'<div class="stat-cell"><div class="stat-val {cls}">{val}</div><div class="stat-label">{label}</div></div>'
+        inner += (
+            f'<div class="stat-cell"><div class="stat-val {cls}">{html.escape(str(val))}</div>'
+            f'<div class="stat-label">{html.escape(str(label))}</div></div>'
+        )
     st.markdown(f'<div class="stat-row">{inner}</div>', unsafe_allow_html=True)
 
 
@@ -350,11 +354,11 @@ def score_bar(name: str, score: float, max_score: float, detail: str):
     st.markdown(f"""
     <div class="score-bar-wrap">
         <div class="score-bar-header">
-            <span class="score-bar-name">{name}</span>
+            <span class="score-bar-name">{html.escape(str(name))}</span>
             <span class="score-bar-nums">{score:.1f} / {max_score:.0f}</span>
         </div>
         <div class="score-bar-track"><div class="score-bar-fill" style="width:{min(pct,100):.1f}%"></div></div>
-        <div class="score-bar-detail">{detail}</div>
+        <div class="score-bar-detail">{html.escape(str(detail))}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -384,23 +388,26 @@ def render_criteria(result):
         conds = ", ".join(crit.get("conditions", []))
         kws = ", ".join(crit.get("keywords", []))
         if conds:
-            lines.append(f'<strong>Conditions</strong> {conds}')
+            lines.append(f'<strong>Conditions</strong> {html.escape(conds)}')
         if kws:
-            lines.append(f'<strong>Keywords</strong> {kws}')
+            lines.append(f'<strong>Keywords</strong> {html.escape(kws)}')
         lines.append(f'<strong>Query</strong> <code>{crit["search_query"]}</code>')
         parts = [f'Sex: {crit["sex_filter"]}']
         parts.append(f'Age: {crit["age_range"]["min"] or "?"}&ndash;{crit["age_range"]["max"] or "?"}')
         lines.append(f'<strong>Filters</strong> {" &middot; ".join(parts)}')
 
-    html = "<br>".join(lines)
-    st.markdown(f'<div class="criteria-panel">{html}</div>', unsafe_allow_html=True)
+    body = "<br>".join(lines)
+    st.markdown(f'<div class="criteria-panel">{body}</div>', unsafe_allow_html=True)
 
 
 def detail_grid(items: list[tuple[str, str]]):
     """Render a key/value detail grid."""
     inner = ""
     for key, val in items:
-        inner += f'<div class="detail-item"><div class="detail-key">{key}</div><div class="detail-value">{val}</div></div>'
+        inner += (
+            f'<div class="detail-item"><div class="detail-key">{html.escape(str(key))}</div>'
+            f'<div class="detail-value">{html.escape(str(val))}</div></div>'
+        )
     st.markdown(f'<div class="detail-grid">{inner}</div>', unsafe_allow_html=True)
 
 
@@ -476,10 +483,10 @@ if score_btn:
         status = data.get("trial_status")
         header_parts = []
         if nct:
-            header_parts.append(f'<span class="tag teal">{nct}</span>')
+            header_parts.append(f'<span class="tag teal">{html.escape(str(nct))}</span>')
         if status:
-            header_parts.append(f'<span class="tag">{status}</span>')
-        st.markdown(f'## {title}', unsafe_allow_html=True)
+            header_parts.append(f'<span class="tag">{html.escape(str(status))}</span>')
+        st.markdown(f'## {html.escape(str(title))}', unsafe_allow_html=True)
         if header_parts:
             st.markdown(" ".join(header_parts), unsafe_allow_html=True)
 
@@ -516,7 +523,7 @@ if score_btn:
                     for r in parsed["exclusion_rules"][:8]:
                         st.markdown(f"- {r}")
                 if parsed["excluded_conditions"]:
-                    excl_tags = " ".join(f'<span class="tag red">{c}</span>' for c in set(parsed["excluded_conditions"]))
+                    excl_tags = " ".join(f'<span class="tag red">{html.escape(str(c))}</span>' for c in set(parsed["excluded_conditions"]))
                     st.markdown(f"**Excluded conditions** {excl_tags}", unsafe_allow_html=True)
 
         patients = data["scored_patients"]
