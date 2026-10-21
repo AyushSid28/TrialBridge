@@ -3,16 +3,18 @@ import requests
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import html
 import json
 import os
 from datetime import datetime
 from pathlib import Path
 
-API_BASE = "http://localhost:8001/api/v1/agents"
-API_KEY = os.getenv("API_KEY", "I1yRx5ycm2uwuYR6RcNgm9HeGxiNctSe")
+API_URL = os.getenv("TRIALBRIDGE_API_URL", "http://localhost:8000").rstrip("/")
+API_BASE = f"{API_URL}/api/v1/agents"
+API_KEY = os.getenv("API_KEY", "")
 API_HEADERS = {"X-API-Key": API_KEY}
 
-st.set_page_config(page_title="Ulalo", layout="wide", page_icon="U")
+st.set_page_config(page_title="TrialBridge", layout="wide", page_icon="T")
 
 # ── Palette ──────────────────────────────────────────────────────────────
 _BG         = "#0C1117"
@@ -36,6 +38,14 @@ PLOTLY_LAYOUT = dict(
     xaxis=dict(gridcolor=_BORDER, zerolinecolor=_BORDER),
     yaxis=dict(gridcolor=_BORDER, zerolinecolor=_BORDER),
 )
+
+FACTOR_LABELS = {
+    "condition": "Condition",
+    "age": "Age",
+    "sex": "Sex",
+    "geography": "Geography",
+    "health": "Health",
+}
 
 # ── Load valid trial IDs ────────────────────────────────────────────────
 VALID_TRIALS_PATH = Path(__file__).resolve().parent / "data" / "valid_trial_ids.json"
@@ -298,14 +308,37 @@ button[data-baseweb="tab"] {{
 
 # ── API helpers ──────────────────────────────────────────────────────────
 
+def _error_detail(resp) -> str:
+    """Pull FastAPI's `detail` out of an error response, tolerating non-JSON bodies.
+
+    Gateways and proxies return HTML or an empty body, which would make
+    resp.json() raise and mask the real status code behind a parse error.
+    """
+    try:
+        payload = resp.json()
+    except ValueError:
+        return (resp.text or "").strip()[:300] or resp.reason or "no response body"
+    if isinstance(payload, dict):
+        return str(payload.get("detail", payload))
+    return str(payload)
+
+
 def api_post(endpoint: str, payload: dict, timeout: int = 120) -> dict | None:
     try:
         resp = requests.post(f"{API_BASE}/{endpoint}", json=payload, headers=API_HEADERS, timeout=timeout)
         if resp.status_code == 200:
             return resp.json()
-        st.error(f"API {resp.status_code}: {resp.json().get('detail', resp.text)}")
+        if resp.status_code == 429:
+            retry_after = resp.headers.get("Retry-After", "")
+            wait = f" Try again in {retry_after}s." if retry_after else ""
+            st.warning(f"Rate limited by the API.{wait}")
+            return None
+        if resp.status_code == 401:
+            st.error("API rejected the key (401). Check that API_KEY matches the backend.")
+            return None
+        st.error(f"API {resp.status_code}: {_error_detail(resp)}")
     except requests.exceptions.ConnectionError:
-        st.error("Cannot connect to backend. Is uvicorn running on port 8001?")
+        st.error(f"Cannot connect to backend at {API_URL}. Is uvicorn running?")
     except Exception as e:
         st.error(f"Request failed: {e}")
     return None
@@ -317,7 +350,10 @@ def stat_row(cells: list[tuple[str, str, str]]):
     """Render a row of stat cells. Each tuple: (value, label, color_class)."""
     inner = ""
     for val, label, cls in cells:
-        inner += f'<div class="stat-cell"><div class="stat-val {cls}">{val}</div><div class="stat-label">{label}</div></div>'
+        inner += (
+            f'<div class="stat-cell"><div class="stat-val {cls}">{html.escape(str(val))}</div>'
+            f'<div class="stat-label">{html.escape(str(label))}</div></div>'
+        )
     st.markdown(f'<div class="stat-row">{inner}</div>', unsafe_allow_html=True)
 
 
@@ -327,11 +363,11 @@ def score_bar(name: str, score: float, max_score: float, detail: str):
     st.markdown(f"""
     <div class="score-bar-wrap">
         <div class="score-bar-header">
-            <span class="score-bar-name">{name}</span>
+            <span class="score-bar-name">{html.escape(str(name))}</span>
             <span class="score-bar-nums">{score:.1f} / {max_score:.0f}</span>
         </div>
         <div class="score-bar-track"><div class="score-bar-fill" style="width:{min(pct,100):.1f}%"></div></div>
-        <div class="score-bar-detail">{detail}</div>
+        <div class="score-bar-detail">{html.escape(str(detail))}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -361,23 +397,26 @@ def render_criteria(result):
         conds = ", ".join(crit.get("conditions", []))
         kws = ", ".join(crit.get("keywords", []))
         if conds:
-            lines.append(f'<strong>Conditions</strong> {conds}')
+            lines.append(f'<strong>Conditions</strong> {html.escape(conds)}')
         if kws:
-            lines.append(f'<strong>Keywords</strong> {kws}')
+            lines.append(f'<strong>Keywords</strong> {html.escape(kws)}')
         lines.append(f'<strong>Query</strong> <code>{crit["search_query"]}</code>')
         parts = [f'Sex: {crit["sex_filter"]}']
         parts.append(f'Age: {crit["age_range"]["min"] or "?"}&ndash;{crit["age_range"]["max"] or "?"}')
         lines.append(f'<strong>Filters</strong> {" &middot; ".join(parts)}')
 
-    html = "<br>".join(lines)
-    st.markdown(f'<div class="criteria-panel">{html}</div>', unsafe_allow_html=True)
+    body = "<br>".join(lines)
+    st.markdown(f'<div class="criteria-panel">{body}</div>', unsafe_allow_html=True)
 
 
 def detail_grid(items: list[tuple[str, str]]):
     """Render a key/value detail grid."""
     inner = ""
     for key, val in items:
-        inner += f'<div class="detail-item"><div class="detail-key">{key}</div><div class="detail-value">{val}</div></div>'
+        inner += (
+            f'<div class="detail-item"><div class="detail-key">{html.escape(str(key))}</div>'
+            f'<div class="detail-value">{html.escape(str(val))}</div></div>'
+        )
     st.markdown(f'<div class="detail-grid">{inner}</div>', unsafe_allow_html=True)
 
 
@@ -413,7 +452,13 @@ with st.sidebar:
 
 # ── Page ─────────────────────────────────────────────────────────────────
 
-st.markdown("# Ulalo")
+if not API_KEY:
+    st.warning(
+        "No API_KEY is set. Export API_KEY to match the value the backend "
+        "expects, otherwise every request is rejected with 401."
+    )
+
+st.markdown("# TrialBridge")
 st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.85rem;">Patient screening for clinical trials</span>', unsafe_allow_html=True)
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 
@@ -431,14 +476,22 @@ with mode_col:
 
 if input_mode == "Select Trial":
     oc1, oc2 = st.columns([3, 1])
-    label = oc1.selectbox(
-        "Clinical trial",
-        options=list(TRIAL_OPTIONS.keys()),
-        index=DEFAULT_TRIAL_IDX,
-        key="score_trial_select",
-        help="Choose the clinical trial whose eligibility criteria will be used to score and rank patients.",
-    )
-    score_trial_id = TRIAL_OPTIONS.get(label, "")
+    trial_labels = list(TRIAL_OPTIONS.keys())
+    if not trial_labels:
+        oc1.error(
+            f"No trials available. Expected {VALID_TRIALS_PATH.name} in data/ "
+            "- use Custom Input instead, or restore the file."
+        )
+        score_trial_id = ""
+    else:
+        label = oc1.selectbox(
+            "Clinical trial",
+            options=trial_labels,
+            index=min(DEFAULT_TRIAL_IDX, len(trial_labels) - 1),
+            key="score_trial_select",
+            help="Choose the clinical trial whose eligibility criteria will be used to score and rank patients.",
+        )
+        score_trial_id = TRIAL_OPTIONS.get(label, "")
     score_limit = oc2.slider(
         "Max patients", 10, 500, 200,
         key="score_limit",
@@ -501,12 +554,12 @@ if score_btn:
         status = data.get("trial_status")
         header_parts = []
         if nct:
-            header_parts.append(f'<span class="tag teal">{nct}</span>')
+            header_parts.append(f'<span class="tag teal">{html.escape(str(nct))}</span>')
         if status:
-            header_parts.append(f'<span class="tag">{status}</span>')
+            header_parts.append(f'<span class="tag">{html.escape(str(status))}</span>')
         run_time = datetime.now().strftime("%b %d, %Y  %H:%M")
         header_parts.append(f'<span class="tag warm">⏱ {run_time}</span>')
-        st.markdown(f'## {title}', unsafe_allow_html=True)
+        st.markdown(f'## {html.escape(str(title))}', unsafe_allow_html=True)
         if header_parts:
             st.markdown(" ".join(header_parts), unsafe_allow_html=True)
 
@@ -543,8 +596,51 @@ if score_btn:
                     for r in parsed["exclusion_rules"][:8]:
                         st.markdown(f"- {r}")
                 if parsed["excluded_conditions"]:
-                    excl_tags = " ".join(f'<span class="tag red">{c}</span>' for c in set(parsed["excluded_conditions"]))
+                    excl_tags = " ".join(f'<span class="tag red">{html.escape(str(c))}</span>' for c in set(parsed["excluded_conditions"]))
                     st.markdown(f"**Excluded conditions** {excl_tags}", unsafe_allow_html=True)
+
+        # ── Pipeline ─────────────────────────────────────────────────
+        pipe = data.get("pipeline") or {}
+        if pipe:
+            with st.expander("Pipeline"):
+                stage_cells = []
+                if pipe.get("stage1_ms") is not None:
+                    stage_cells.append((f'{pipe["stage1_ms"]} ms', "Text-to-SQL", ""))
+                if pipe.get("stage2_ms") is not None:
+                    stage_cells.append((f'{pipe["stage2_ms"]} ms', "Root word search", ""))
+                if pipe.get("stage3_ms") is not None:
+                    stage_cells.append((f'{pipe["stage3_ms"]} ms', "Scoring", ""))
+                if pipe.get("total_ms") is not None:
+                    stage_cells.append((f'{pipe["total_ms"]} ms', "Total", "accent"))
+                if stage_cells:
+                    stat_row(stage_cells)
+
+                flags = []
+                flags.append(
+                    f'<span class="tag teal">cache hit</span>' if pipe.get("cache_hit")
+                    else '<span class="tag">cache miss</span>'
+                )
+                flags.append(
+                    f'<span class="tag teal">pre-filter applied</span>' if pipe.get("used_prefilter")
+                    else '<span class="tag warm">pre-filter skipped</span>'
+                )
+                flags.append(
+                    f'<span class="tag">{pipe.get("text_to_sql_prefiltered", 0)} pre-filtered'
+                    f' &rarr; {pipe.get("root_word_verified", 0)} verified</span>'
+                )
+                st.markdown(" ".join(flags), unsafe_allow_html=True)
+
+                generated = pipe.get("text_to_sql_query")
+                if generated:
+                    st.markdown("**Generated SQL**")
+                    st.code(generated, language="sql")
+                else:
+                    st.markdown(
+                        f'<span style="color:{_TEXT_DIM}; font-size:0.8rem;">'
+                        "No SQL generated - the pre-filter was skipped or failed, and the "
+                        "search ran against the full table.</span>",
+                        unsafe_allow_html=True,
+                    )
 
         patients = data["scored_patients"]
         eligible_patients = [p for p in patients if not p["excluded"]]
@@ -579,6 +675,8 @@ if score_btn:
                 cats = ["Condition", "Age", "Sex", "Geography", "Health"]
                 vals = [bd["condition"]["score"], bd["age"]["score"], bd["sex"]["score"], bd["geography"]["score"], bd["health"]["score"]]
                 maxv = [bd["condition"]["max"], bd["age"]["max"], bd["sex"]["max"], bd["geography"]["max"], bd["health"]["max"]]
+                # Give the outer ring a little headroom above the largest weight.
+                radar_max = max(maxv) * 1.15 if maxv else 1
                 fig_r = go.Figure()
                 fig_r.add_trace(go.Scatterpolar(
                     r=maxv + [maxv[0]], theta=cats + [cats[0]],
@@ -594,7 +692,7 @@ if score_btn:
                     **PLOTLY_LAYOUT, height=300, showlegend=False,
                     polar=dict(
                         bgcolor="rgba(0,0,0,0)",
-                        radialaxis=dict(visible=True, range=[0, 35], gridcolor=_BORDER, color=_TEXT_DIM, tickfont=dict(size=10)),
+                        radialaxis=dict(visible=True, range=[0, radar_max], gridcolor=_BORDER, color=_TEXT_DIM, tickfont=dict(size=10)),
                         angularaxis=dict(gridcolor=_BORDER, color=_TEXT_DIM),
                     ),
                 )
@@ -663,7 +761,7 @@ if score_btn:
             st.markdown("### Patient Inspector")
 
             opts = {
-                f"#{i+1}  {p.get('display_patient_id', p['patient_id'][:8])}  ({p['composite_score']})": p
+                f"#{i+1}  {p.get('display_patient_id') or p['patient_id'][:8]}  ({p['composite_score']})": p
                 for i, p in enumerate(eligible_patients)
             }
             sel = opts[st.selectbox("Select patient", list(opts.keys()), key="score_patient_sel")]
@@ -686,7 +784,7 @@ if score_btn:
 
             with col_score:
                 for factor, d in sel["breakdown"].items():
-                    score_bar(factor, d["score"], d["max"], d["details"])
+                    score_bar(FACTOR_LABELS.get(factor, factor.title()), d["score"], d["max"], d["details"])
 
         # ── Footer ───────────────────────────────────────────────────
         st.markdown(f'<div style="margin-top:2rem; font-size:0.72rem; color:{_TEXT_DIM};">Audit log {data.get("audit_log_id", "N/A")}</div>', unsafe_allow_html=True)
