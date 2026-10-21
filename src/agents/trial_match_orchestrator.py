@@ -106,11 +106,49 @@ class TrialMatchOrchestrator:
             {"tid": trial_id},
         )
         row = result.fetchone()
-        if not row:
-            return None
+        if row:
+            cols = list(result.keys())
+            return dict(zip(cols, row))
 
-        cols = list(result.keys())
-        return dict(zip(cols, row))
+        # Dynamic fallback: If not in local DB, fetch from ClinicalTrials.gov API and cache
+        clean_id = trial_id.strip().upper()
+        if clean_id.startswith("NCT"):
+            try:
+                import asyncio
+                import requests
+                from src.scrappers.us_clinical_trials_scrapping import process_trial, upsert_clinical_trial
+
+                def _fetch_api(nct: str):
+                    url = f"https://clinicaltrials.gov/api/v2/studies/{nct}"
+                    resp = requests.get(url, timeout=10)
+                    if resp.status_code == 200:
+                        return resp.json()
+                    return None
+
+                data = await asyncio.to_thread(_fetch_api, clean_id)
+                if data:
+                    doc = process_trial(data)
+                    if doc:
+                        await upsert_clinical_trial(self.session, doc)
+                        await self.session.flush()
+
+                        result = await self.session.execute(
+                            text("""
+                                SELECT id, nct_id, title, sponsor, status, payload
+                                FROM clinical_trials
+                                WHERE nct_id = :tid
+                                LIMIT 1
+                            """),
+                            {"tid": clean_id},
+                        )
+                        row = result.fetchone()
+                        if row:
+                            cols = list(result.keys())
+                            return dict(zip(cols, row))
+            except Exception as e:
+                logger.warning("Dynamic trial fetch failed", extra={"trial_id": trial_id, "error": str(e)})
+
+        return None
 
     def extract_criteria(self, trial: dict) -> dict:
         payload = trial.get("payload", {})
