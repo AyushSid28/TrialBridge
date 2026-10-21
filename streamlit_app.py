@@ -425,7 +425,7 @@ def detail_grid(items: list[tuple[str, str]]):
 with st.sidebar:
     st.markdown(f"""
     <div style="padding: 0.5rem 0 1rem 0;">
-        <span style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; color: {_TEXT};">Ulalo</span>
+        <span style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; color: {_TEXT};">TrialBridge</span>
         <span style="display: inline-block; margin-left: 0.5rem; padding: 0.1rem 0.45rem; border-radius: 4px;
                       font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em;
                       background: rgba(90,158,148,0.15); color: {_ACCENT}; border: 1px solid rgba(90,158,148,0.3);">
