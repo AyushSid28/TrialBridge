@@ -7,7 +7,8 @@ import json
 import os
 from pathlib import Path
 
-API_BASE = "http://localhost:8001/api/v1/agents"
+API_URL = os.getenv("TRIALBRIDGE_API_URL", "http://localhost:8000").rstrip("/")
+API_BASE = f"{API_URL}/api/v1/agents"
 API_KEY = os.getenv("API_KEY", "I1yRx5ycm2uwuYR6RcNgm9HeGxiNctSe")
 API_HEADERS = {"X-API-Key": API_KEY}
 
@@ -304,7 +305,7 @@ def api_post(endpoint: str, payload: dict, timeout: int = 120) -> dict | None:
             return resp.json()
         st.error(f"API {resp.status_code}: {resp.json().get('detail', resp.text)}")
     except requests.exceptions.ConnectionError:
-        st.error("Cannot connect to backend. Is uvicorn running on port 8001?")
+        st.error(f"Cannot connect to backend at {API_URL}. Is uvicorn running?")
     except Exception as e:
         st.error(f"Request failed: {e}")
     return None
