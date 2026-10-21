@@ -298,12 +298,27 @@ button[data-baseweb="tab"] {{
 
 # ── API helpers ──────────────────────────────────────────────────────────
 
+def _error_detail(resp) -> str:
+    """Pull FastAPI's `detail` out of an error response, tolerating non-JSON bodies.
+
+    Gateways and proxies return HTML or an empty body, which would make
+    resp.json() raise and mask the real status code behind a parse error.
+    """
+    try:
+        payload = resp.json()
+    except ValueError:
+        return (resp.text or "").strip()[:300] or resp.reason or "no response body"
+    if isinstance(payload, dict):
+        return str(payload.get("detail", payload))
+    return str(payload)
+
+
 def api_post(endpoint: str, payload: dict, timeout: int = 120) -> dict | None:
     try:
         resp = requests.post(f"{API_BASE}/{endpoint}", json=payload, headers=API_HEADERS, timeout=timeout)
         if resp.status_code == 200:
             return resp.json()
-        st.error(f"API {resp.status_code}: {resp.json().get('detail', resp.text)}")
+        st.error(f"API {resp.status_code}: {_error_detail(resp)}")
     except requests.exceptions.ConnectionError:
         st.error(f"Cannot connect to backend at {API_URL}. Is uvicorn running?")
     except Exception as e:
