@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: trialbridge
+          POSTGRES_PASSWORD: trialbridge
+          POSTGRES_DB: trialbridge_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U trialbridge -d trialbridge_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://trialbridge:trialbridge@localhost:5432/trialbridge_test
+      SECRET_KEY: ci-secret-key
+      API_KEY: ci-api-key
+      ENVIRONMENT: development
+      DEBUG: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Set up Python
+        run: uv python install 3.11
+      - name: Install dependencies
+        run: uv sync --extra dev
+      - name: Unit tests
+        run: uv run pytest tests/test_db_url.py tests/test_rate_limiter.py tests/test_health.py -q
+      - name: Model tests
+        run: uv run pytest tests/test_models.py -q

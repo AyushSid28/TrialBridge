@@ -1,5 +1,15 @@
 """Tests configuration and fixtures."""
 
+import os
+
+# Settings are read at import time; give tests a safe fallback when .env is absent.
+os.environ.setdefault(
+    "DATABASE_URL", "postgresql://trialbridge:trialbridge@localhost:5432/trialbridge_test"
+)
+os.environ.setdefault("SECRET_KEY", "test-secret-key")
+os.environ.setdefault("API_KEY", "test-api-key")
+os.environ.setdefault("ENVIRONMENT", "development")
+
 import pytest
 import pytest_asyncio
 from typing import AsyncGenerator

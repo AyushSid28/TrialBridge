@@ -10,7 +10,7 @@ class Settings(BaseSettings):
         extra="allow",
     )
 
-    APP_NAME: str = "FastAPI Clean Architecture"
+    APP_NAME: str = "TrialBridge"
     APP_VERSION: str = "0.1.0"
     DEBUG: bool = False
     ENVIRONMENT: str = "production"
@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
-    ALLOWED_ORIGINS: str = "http://localhost:3000"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:8501"
 
     API_V1_PREFIX: str = "/api/v1"
     API_KEY: str = Field(
