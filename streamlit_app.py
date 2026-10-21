@@ -38,6 +38,14 @@ PLOTLY_LAYOUT = dict(
     yaxis=dict(gridcolor=_BORDER, zerolinecolor=_BORDER),
 )
 
+FACTOR_LABELS = {
+    "condition": "Condition",
+    "age": "Age",
+    "sex": "Sex",
+    "geography": "Geography",
+    "health": "Health",
+}
+
 # ── Load valid trial IDs ────────────────────────────────────────────────
 VALID_TRIALS_PATH = Path(__file__).resolve().parent / "data" / "valid_trial_ids.json"
 
@@ -658,7 +666,7 @@ if score_btn:
 
             with col_score:
                 for factor, d in sel["breakdown"].items():
-                    score_bar(factor, d["score"], d["max"], d["details"])
+                    score_bar(FACTOR_LABELS.get(factor, factor.title()), d["score"], d["max"], d["details"])
 
         # ── Footer ───────────────────────────────────────────────────
         st.markdown(f'<div style="margin-top:2rem; font-size:0.72rem; color:{_TEXT_DIM};">Audit log {data.get("audit_log_id", "N/A")}</div>', unsafe_allow_html=True)
