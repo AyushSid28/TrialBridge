@@ -427,13 +427,21 @@ with mode_col:
 
 if input_mode == "Select Trial":
     oc1, oc2 = st.columns([3, 1])
-    label = oc1.selectbox(
-        "Clinical trial",
-        options=list(TRIAL_OPTIONS.keys()),
-        index=DEFAULT_TRIAL_IDX,
-        key="score_trial_select",
-    )
-    score_trial_id = TRIAL_OPTIONS.get(label, "")
+    trial_labels = list(TRIAL_OPTIONS.keys())
+    if not trial_labels:
+        oc1.error(
+            f"No trials available. Expected {VALID_TRIALS_PATH.name} in data/ "
+            "- use Custom Input instead, or restore the file."
+        )
+        score_trial_id = ""
+    else:
+        label = oc1.selectbox(
+            "Clinical trial",
+            options=trial_labels,
+            index=min(DEFAULT_TRIAL_IDX, len(trial_labels) - 1),
+            key="score_trial_select",
+        )
+        score_trial_id = TRIAL_OPTIONS.get(label, "")
     score_limit = oc2.slider("Max patients", 10, 500, 200, key="score_limit")
 else:
     search_query = st.text_area(
