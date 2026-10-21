@@ -534,6 +534,49 @@ if score_btn:
                     excl_tags = " ".join(f'<span class="tag red">{html.escape(str(c))}</span>' for c in set(parsed["excluded_conditions"]))
                     st.markdown(f"**Excluded conditions** {excl_tags}", unsafe_allow_html=True)
 
+        # ── Pipeline ─────────────────────────────────────────────────
+        pipe = data.get("pipeline") or {}
+        if pipe:
+            with st.expander("Pipeline"):
+                stage_cells = []
+                if pipe.get("stage1_ms") is not None:
+                    stage_cells.append((f'{pipe["stage1_ms"]} ms', "Text-to-SQL", ""))
+                if pipe.get("stage2_ms") is not None:
+                    stage_cells.append((f'{pipe["stage2_ms"]} ms', "Root word search", ""))
+                if pipe.get("stage3_ms") is not None:
+                    stage_cells.append((f'{pipe["stage3_ms"]} ms', "Scoring", ""))
+                if pipe.get("total_ms") is not None:
+                    stage_cells.append((f'{pipe["total_ms"]} ms', "Total", "accent"))
+                if stage_cells:
+                    stat_row(stage_cells)
+
+                flags = []
+                flags.append(
+                    f'<span class="tag teal">cache hit</span>' if pipe.get("cache_hit")
+                    else '<span class="tag">cache miss</span>'
+                )
+                flags.append(
+                    f'<span class="tag teal">pre-filter applied</span>' if pipe.get("used_prefilter")
+                    else '<span class="tag warm">pre-filter skipped</span>'
+                )
+                flags.append(
+                    f'<span class="tag">{pipe.get("text_to_sql_prefiltered", 0)} pre-filtered'
+                    f' &rarr; {pipe.get("root_word_verified", 0)} verified</span>'
+                )
+                st.markdown(" ".join(flags), unsafe_allow_html=True)
+
+                generated = pipe.get("text_to_sql_query")
+                if generated:
+                    st.markdown("**Generated SQL**")
+                    st.code(generated, language="sql")
+                else:
+                    st.markdown(
+                        f'<span style="color:{_TEXT_DIM}; font-size:0.8rem;">'
+                        "No SQL generated - the pre-filter was skipped or failed, and the "
+                        "search ran against the full table.</span>",
+                        unsafe_allow_html=True,
+                    )
+
         patients = data["scored_patients"]
         eligible_patients = [p for p in patients if not p["excluded"]]
 
