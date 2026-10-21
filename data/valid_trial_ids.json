@@ -1,139 +1,1154 @@
 [
   {
-    "nct_id": "NCT00984685",
-    "title": "\"Assessment of Risk Factors for Depression Treatment at a Safety Net Clinic\"",
-    "status": "UNKNOWN",
+    "nct_id": "NCT00131014",
+    "title": "Establishing a Tumor Bank in Families With Multiple Lymphoproliferative Malignancies",
+    "status": "RECRUITING",
     "conditions": [
-      "Depression"
+      "Non-Hodgkin's Lymphoma",
+      "Hodgkin's Disease",
+      "Leukemia, Lymphocytic, Chronic",
+      "Lymphoproliferative Disorders"
     ],
-    "patient_count": 756
+    "patient_count": 36
   },
   {
-    "nct_id": "NCT01062880",
-    "title": "Neuropattern - Assessment of a Translational Diagnostic Tool for Depression, Adjustment- and Somatoform-disorders",
+    "nct_id": "NCT00840164",
+    "title": "Pathology of Skin, Nerve and Vasculature in the Amputated Limb of Diabetes",
     "status": "UNKNOWN",
     "conditions": [
-      "Major Depression",
-      "Minor Depression",
-      "Somatoform Disorders",
-      "Adjustment Disorders"
+      "Wound",
+      "Diabetes",
+      "Amputation"
     ],
-    "patient_count": 756
+    "patient_count": 1831
   },
   {
-    "nct_id": "NCT01909388",
-    "title": "Dose Escalation to Dominant Intraprostatic Lesions (DIL) With MRI-TRUS Fusion High Dose Rate (HDR) Prostate Brachytherapy",
+    "nct_id": "NCT00926406",
+    "title": "Environmental Exposure to Lead and Its Health Effects on Patients With Maintenance Hemodialysis",
     "status": "UNKNOWN",
     "conditions": [
-      "Prostate Cancer"
+      "Anemia",
+      "Malnutrition",
+      "Inflammation",
+      "Lead Poisoning"
     ],
-    "patient_count": 326
+    "patient_count": 18
   },
   {
-    "nct_id": "NCT01917279",
-    "title": "Capecitabine Maintenance Therapy Following Capecitabine Combined With Docetaxel in Treatment of mBC",
+    "nct_id": "NCT01702545",
+    "title": "Determination of Drugs and Their Metabolites in Hospitalized Patients",
     "status": "UNKNOWN",
     "conditions": [
-      "Breast Neoplasms",
-      "Neoplasms by Site",
-      "Neoplasm Metastasis",
-      "Breast Diseases",
-      "Skin Diseases"
+      "Neoplasms"
+    ],
+    "patient_count": 167
+  },
+  {
+    "nct_id": "NCT02010814",
+    "title": "Characterization of a Prospective Cohort of Women With PCOS",
+    "status": "RECRUITING",
+    "conditions": [
+      "Polycystic Ovary Syndrome"
+    ],
+    "patient_count": 279
+  },
+  {
+    "nct_id": "NCT02034149",
+    "title": "The Cost Effectiveness and Evaluation of Disease Management of Chronic Kidney Disease and High Risk Population",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Chronic Kidney Diseases",
+      "Chronic Kidney Insufficiency"
+    ],
+    "patient_count": 580
+  },
+  {
+    "nct_id": "NCT02063152",
+    "title": "102 Annual Pap Smear Screening Database Maintenance Project",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Cancer",
+      "Human Papillomavirus"
+    ],
+    "patient_count": 1009
+  },
+  {
+    "nct_id": "NCT02420470",
+    "title": "The Early Warning System for the Diabetic Encephalopathy",
+    "status": "RECRUITING",
+    "conditions": [
+      "Diabetes Mellitus Type 2",
+      "Mild Cognitive Impairment",
+      "Metabolic Syndrome X"
+    ],
+    "patient_count": 1831
+  },
+  {
+    "nct_id": "NCT02682667",
+    "title": "Biospecimen Procurement for Center for Immuno-Oncology Immunotherapy Protocols",
+    "status": "RECRUITING",
+    "conditions": [
+      "Multiple Myeloma",
+      "Lymphoma, Non-Hodgkin",
+      "Leukemia-Lymphoma, Adult T-Cell",
+      "Hodgkin Disease",
+      "Non-Small Cell Lung Cancer"
+    ],
+    "patient_count": 36
+  },
+  {
+    "nct_id": "NCT02778802",
+    "title": "Pulmonary Hemodynamics in Patients With Severe Emphysema Pre and Post BLVR",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Pulmonary Hypertension",
+      "Chronic Obstructive Lung Disease"
+    ],
+    "patient_count": 835
+  },
+  {
+    "nct_id": "NCT02967484",
+    "title": "Acupuncture Lowering Blood Pressure for Secondary Prevention of Stroke",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Cerebral Infarction"
+    ],
+    "patient_count": 78
+  },
+  {
+    "nct_id": "NCT03022552",
+    "title": "Heart Attack Research Program: Platelet Sub-Study (HARP)",
+    "status": "RECRUITING",
+    "conditions": [
+      "Myocardial Infarction"
+    ],
+    "patient_count": 774
+  },
+  {
+    "nct_id": "NCT03093116",
+    "title": "A Study of Repotrectinib (TPX-0005) in Patients With Advanced Solid Tumors Harboring ALK, ROS1, or NTRK1-3 Rearrangements",
+    "status": "RECRUITING",
+    "conditions": [
+      "Locally Advanced Solid Tumors",
+      "Metastatic Solid Tumors"
+    ],
+    "patient_count": 206
+  },
+  {
+    "nct_id": "NCT03262298",
+    "title": "Anti-CD22 CAR-T Cell Therapy Targeting B Cell Malignancies",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Leukemia",
+      "Lymphoma"
+    ],
+    "patient_count": 77
+  },
+  {
+    "nct_id": "NCT03496636",
+    "title": "Autologous Ovarian Tissue Transplantation",
+    "status": "RECRUITING",
+    "conditions": [
+      "Female Infertility"
+    ],
+    "patient_count": 279
+  },
+  {
+    "nct_id": "NCT03650933",
+    "title": "A Study Comparing the Efficacy and Safety of G-CHOP Versus R-CHOP in Untreated Diffuse Large B-cell Lymphoma Patients",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Diffuse Large B-Cell Lymphoma, Unspecified Site"
+    ],
+    "patient_count": 32
+  },
+  {
+    "nct_id": "NCT03795714",
+    "title": "Association Between IVUS and OCT Parameters and Invasive Physiologic Indices",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Ischemic Heart Disease"
+    ],
+    "patient_count": 68
+  },
+  {
+    "nct_id": "NCT03844399",
+    "title": "(3D) Ultrasound Imaging Liver and Kidney",
+    "status": "RECRUITING",
+    "conditions": [
+      "Liver Cancer",
+      "Kidney Cancer"
+    ],
+    "patient_count": 96
+  },
+  {
+    "nct_id": "NCT04032639",
+    "title": "Stress and Brain Response Using MEG in PWS",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Prader-Willi Syndrome"
+    ],
+    "patient_count": 4
+  },
+  {
+    "nct_id": "NCT04043572",
+    "title": "The Biomarkers of Neurological Disease in Utero Study",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Epilepsy",
+      "Neurodevelopmental Disorders",
+      "Fetal Disease",
+      "Teratogenesis"
+    ],
+    "patient_count": 1
+  },
+  {
+    "nct_id": "NCT04129021",
+    "title": "High Resolution, High-speed Multimodal Ophthalmic Imaging",
+    "status": "RECRUITING",
+    "conditions": [
+      "Retinitis Pigmentosa",
+      "Maculopathy, Age Related",
+      "Macular Dystrophy",
+      "Macular Edema",
+      "Retinal Detachment",
+      "Retinal Degeneration",
+      "Glaucoma",
+      "Vascular Inflammation",
+      "Hypertension",
+      "Stroke",
+      "Diabetes",
+      "Corneal Dystrophy",
+      "Keratoconus",
+      "Dry Eye",
+      "Trauma"
+    ],
+    "patient_count": 2198
+  },
+  {
+    "nct_id": "NCT04160871",
+    "title": "\"Family Connections\": a Program for Relatives of People With Borderline Personality Disorder",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Relatives"
+    ],
+    "patient_count": 4
+  },
+  {
+    "nct_id": "NCT04278404",
+    "title": "Pharmacokinetics, Pharmacodynamics, and Safety Profile of Understudied Drugs Administered to Children Per Standard of Care (POPS)",
+    "status": "RECRUITING",
+    "conditions": [
+      "Coronavirus Infection (COVID-19)",
+      "Pulmonary Arterial Hypertension",
+      "Urinary Tract Infections in Children",
+      "Hypertension",
+      "Pain",
+      "Hyperphosphatemia",
+      "Primary Hyperaldosteronism",
+      "Edema",
+      "Hypokalemia",
+      "Heart Failure",
+      "Hemophilia",
+      "Menorrhagia",
+      "Insomnia",
+      "Pneumonia",
+      "Skin Infection",
+      "Arrythmia",
+      "Asthma in Children",
+      "Bronchopulmonary Dysplasia",
+      "Adrenal Insufficiency",
+      "Fibrinolysis; Hemorrhage",
+      "Attention Deficit Hyperactivity Disorder",
+      "Multisystem Inflammatory Syndrome in Children (MIS-C)",
+      "Kawasaki Disease",
+      "Coagulation Disorder",
+      "Down Syndrome"
+    ],
+    "patient_count": 753
+  },
+  {
+    "nct_id": "NCT04744948",
+    "title": "Effect Of Treadmill Based Aerobic Exercise Intervention On Menstruation And Quality Of Life In Women With Polycystic Ovarian Syndrome",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Polycystic Ovary Syndrome",
+      "Irregular Menses"
+    ],
+    "patient_count": 279
+  },
+  {
+    "nct_id": "NCT04900064",
+    "title": "Evaluation of Primary Care Behavioral Health (PCBH) With the Addition of Self-help CBT - A Randomized Multicenter Trial",
+    "status": "RECRUITING",
+    "conditions": [
+      "Panic Disorder",
+      "Social Anxiety Disorder",
+      "Depression",
+      "Hypochondriasis",
+      "Insomnia",
+      "Generalized Anxiety Disorder",
+      "Burnout",
+      "Adjustment Disorders",
+      "Stress, Psychological",
+      "Obsessive-Compulsive Disorder",
+      "Life Stress",
+      "Life Style Induced Illness",
+      "Psychological Distress"
+    ],
+    "patient_count": 1944
+  },
+  {
+    "nct_id": "NCT05224401",
+    "title": "Pivmecillinam With Amoxicillin/Clavulanic Acid for Step Down Oral Therapy in ESBL UTIs",
+    "status": "RECRUITING",
+    "conditions": [
+      "Urinary Tract Infections",
+      "Bacteremia",
+      "Antibiotic Resistant Infection"
+    ],
+    "patient_count": 1
+  },
+  {
+    "nct_id": "NCT05240716",
+    "title": "Functional Electrical Stimulation on Tibial Nerve in Stroke Patients.",
+    "status": "RECRUITING",
+    "conditions": [
+      "Chronic Stroke"
+    ],
+    "patient_count": 71
+  },
+  {
+    "nct_id": "NCT05250037",
+    "title": "The Longitudinal Impact of Respiratory Viruses on Bronchiolitis Obliterans Syndrome After Allogeneic Hematopoietic Cell Transplantation (The RV-BOS Study)",
+    "status": "RECRUITING",
+    "conditions": [
+      "Bronchiolitis Obliterans Syndrome",
+      "Hematopoietic and Lymphoid Cell Neoplasm"
+    ],
+    "patient_count": 373
+  },
+  {
+    "nct_id": "NCT05341453",
+    "title": "Hippotherapy in Children With Spinal Muscular Atrophy",
+    "status": "RECRUITING",
+    "conditions": [
+      "Spinal Muscular Atrophy"
     ],
     "patient_count": 25
   },
   {
-    "nct_id": "NCT02444013",
-    "title": "Folic Acid for Prevention of Contrast Induced Nephropathy",
+    "nct_id": "NCT05369065",
+    "title": "Ablation of Arteries for the Treatment of Type 2 Diabetes Mellitus and Its Comorbidities",
+    "status": "RECRUITING",
+    "conditions": [
+      "Diabetes Mellitus, Type 2",
+      "Hypertension"
+    ],
+    "patient_count": 1891
+  },
+  {
+    "nct_id": "NCT05414409",
+    "title": "The Gut Microbiome in Type 1 Diabetes and Mechanism of Metformin Action",
+    "status": "RECRUITING",
+    "conditions": [
+      "Type 1 Diabetes",
+      "Obesity"
+    ],
+    "patient_count": 47
+  },
+  {
+    "nct_id": "NCT05571514",
+    "title": "Study of the Impact of Mother-of-pearl Nutritional Supplementation on the Prevention of Post-menopausal Osteoporosis",
+    "status": "RECRUITING",
+    "conditions": [
+      "Post Menopausal Osteoporosis"
+    ],
+    "patient_count": 3
+  },
+  {
+    "nct_id": "NCT05581147",
+    "title": "Thyroid Function and Structure in Klinefelter Syndrome",
+    "status": "RECRUITING",
+    "conditions": [
+      "Klinefelter Syndrome",
+      "Thyroiditis, Autoimmune",
+      "Hypothyroidism"
+    ],
+    "patient_count": 7
+  },
+  {
+    "nct_id": "NCT05588375",
+    "title": "The Effects of Home-based Physical Activity Telemonitoring Program in Patients With Heart Failure and Muscle Wasting",
     "status": "UNKNOWN",
     "conditions": [
-      "Kidney Diseases",
-      "Urologic Diseases"
+      "Sarcopenia",
+      "Muscular Atrophy",
+      "Wasting Syndrome",
+      "Heart Failure"
     ],
-    "patient_count": 169
+    "patient_count": 28
   },
   {
-    "nct_id": "NCT06185296",
-    "title": "The Intelligent Diabetes TelemonitoRing Using Decision Support to Treat Patients on Insulin Therapy",
+    "nct_id": "NCT05663632",
+    "title": "Triglyceride-Glucose Index In Heart Failure Patients In Sohag University Hospital",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Heart Failure",
+      "Insulin Resistance"
+    ],
+    "patient_count": 36
+  },
+  {
+    "nct_id": "NCT05666167",
+    "title": "Expanding Exercise Programming for Veterans Through Telehealth",
     "status": "RECRUITING",
     "conditions": [
-      "Type 2 Diabetes Treated With Insulin"
+      "Arthritis"
     ],
-    "patient_count": 655
+    "patient_count": 3578
   },
   {
-    "nct_id": "NCT06188923",
-    "title": "A New Intervention to Improve Function in Veterans With Anxiety and Depression",
+    "nct_id": "NCT05697263",
+    "title": "The Impact of the Menstrual Cycle on Physical Exercise and Performance",
     "status": "RECRUITING",
     "conditions": [
-      "Anxiety and Depression"
+      "Menstrual Cycle",
+      "Exercise",
+      "Women's Health",
+      "Athletic Performance"
     ],
-    "patient_count": 756
+    "patient_count": 6
   },
   {
-    "nct_id": "NCT06230718",
-    "title": "EMG Analysis in ABI: Motor Imagery and Action",
+    "nct_id": "NCT05797584",
+    "title": "Right Ventricular Contractile Reserve in HF",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Heart Failure"
+    ],
+    "patient_count": 28
+  },
+  {
+    "nct_id": "NCT05811312",
+    "title": "Brain Connectivity Changes With Spinal Cord Stimulation and Treatment of Chronic Pain: A Resting State NIRS/EEG Study",
     "status": "RECRUITING",
     "conditions": [
-      "Stroke",
-      "Quality of Life",
-      "Mirror Movement"
+      "Neuropathic Pain"
     ],
-    "patient_count": 174
+    "patient_count": 15
   },
   {
-    "nct_id": "NCT06390462",
-    "title": "Adolescent Interpersonal Counseling in Primary Care",
+    "nct_id": "NCT05819853",
+    "title": "Role of Semaglutide in Restoring Ovulation in Youth and Adults With Polycystic Ovary Syndrome",
     "status": "RECRUITING",
     "conditions": [
-      "Depressive Symptoms Mild to Moderate in Severity",
-      "Major Depressive Disorder"
+      "PCOS (Polycystic Ovary Syndrome) of Bilateral Ovaries",
+      "Obese"
     ],
-    "patient_count": 756
+    "patient_count": 48
   },
   {
-    "nct_id": "NCT06831435",
-    "title": "Effectiveness of Digital Cognitive Behavioral Therapy for the Treatment of Depression: a Real-world Study",
+    "nct_id": "NCT05848765",
+    "title": "Relapsed Follicular Lymphoma Randomised Trial Against Standard ChemoTherapy",
+    "status": "RECRUITING",
+    "conditions": [
+      "Relapsed Follicular Lymphoma",
+      "Refractory Follicular Lymphoma"
+    ],
+    "patient_count": 77
+  },
+  {
+    "nct_id": "NCT05883072",
+    "title": "Exploring the Effectiveness of AI Generative Models for Diabetic Patients",
+    "status": "RECRUITING",
+    "conditions": [
+      "Diabetes Mellitus, Type 2",
+      "Diabetic Retinopathy",
+      "Diabetes"
+    ],
+    "patient_count": 1831
+  },
+  {
+    "nct_id": "NCT06005246",
+    "title": "Munich ME/CFS Cohort Study",
+    "status": "RECRUITING",
+    "conditions": [
+      "Myalgic Encephalomyelitis/Chronic Fatigue Syndrome (ME/CFS) (ICD-10 G93.3)"
+    ],
+    "patient_count": 38
+  },
+  {
+    "nct_id": "NCT06015620",
+    "title": "Comorbidities Resolution After MGB Surgery and Change in Body Composition",
+    "status": "RECRUITING",
+    "conditions": [
+      "Morbid Obesity",
+      "Type2diabetes",
+      "Sleep Apnea",
+      "Hypothyroidism",
+      "Hypertension",
+      "Lipid Disorder",
+      "Non-Alcoholic Fatty Liver Disease",
+      "Chronic Venous Hypertension With Ulcer"
+    ],
+    "patient_count": 92
+  },
+  {
+    "nct_id": "NCT06032039",
+    "title": "Corticosteroid vs Platelet-Rich Plasma Intra-articular Injections in the Treatment of Knee Osteoarthritis.",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Knee Osteoarthritis"
+    ],
+    "patient_count": 1
+  },
+  {
+    "nct_id": "NCT06048393",
+    "title": "SA55 Novel Coronavirus Broad-spectrum Neutralizing Antibody Nasal Spray in Health People",
+    "status": "UNKNOWN",
+    "conditions": [
+      "COVID-19"
+    ],
+    "patient_count": 35
+  },
+  {
+    "nct_id": "NCT06052475",
+    "title": "Physiological Versus Right Ventricular Outcome Trial Evaluated for Bradycardia Treatment Upgrades",
+    "status": "RECRUITING",
+    "conditions": [
+      "Pacing-Induced Cardiomyopathy",
+      "Heart Failure"
+    ],
+    "patient_count": 28
+  },
+  {
+    "nct_id": "NCT06068647",
+    "title": "Ultrasound and Respiratory Physiological Signals in Lung Diseases",
+    "status": "RECRUITING",
+    "conditions": [
+      "Interstitial Lung Disease",
+      "Interstitial Lung Diseases",
+      "Interstitial Pneumonia",
+      "Chronic Obstructive Pulmonary Disease",
+      "Emphysema or COPD",
+      "Ultrasonography",
+      "Ultrasound Imaging",
+      "Ultrasound"
+    ],
+    "patient_count": 874
+  },
+  {
+    "nct_id": "NCT06073665",
+    "title": "Dosing of LT4 in Older Individuals",
+    "status": "RECRUITING",
+    "conditions": [
+      "Hypothyroidism"
+    ],
+    "patient_count": 3
+  },
+  {
+    "nct_id": "NCT06203301",
+    "title": "The Relationships of Resistance Exercise, Walking, Myokine Secretion, Sarcopenia, Muscle Loss, Quality of Life, and Predictors in Cancer Patients Receiving Chemoradiotheray",
+    "status": "UNKNOWN",
+    "conditions": [
+      "Cancer"
+    ],
+    "patient_count": 1009
+  },
+  {
+    "nct_id": "NCT06255886",
+    "title": "Treatment of Gastroesophageal Reflux Disease in Infants",
+    "status": "RECRUITING",
+    "conditions": [
+      "Gastroesophageal Reflux",
+      "Infant, Newborn, Diseases"
+    ],
+    "patient_count": 3
+  },
+  {
+    "nct_id": "NCT06279676",
+    "title": "Improvement of Women's Health After Allogeneic Stem Cell Transplantation",
+    "status": "RECRUITING",
+    "conditions": [
+      "GVHD, Chronic"
+    ],
+    "patient_count": 69
+  },
+  {
+    "nct_id": "NCT06302777",
+    "title": "MAIN-IMAGE Registry",
+    "status": "RECRUITING",
+    "conditions": [
+      "Coronary Artery Disease"
+    ],
+    "patient_count": 19
+  },
+  {
+    "nct_id": "NCT06345339",
+    "title": "A Study to Assess the Safety and Efficacy of Oral Armour Thyroid Compared to Synthetic T4 for the Treatment of Primary Hypothyroidism in Adult Participants",
+    "status": "RECRUITING",
+    "conditions": [
+      "Hypothyroidism"
+    ],
+    "patient_count": 3
+  },
+  {
+    "nct_id": "NCT06455371",
+    "title": "Patient-centered Dosage of Levothyroxine",
+    "status": "RECRUITING",
+    "conditions": [
+      "Hypothyroidism",
+      "Thyroid Cancer",
+      "Thyroid"
+    ],
+    "patient_count": 7
+  },
+  {
+    "nct_id": "NCT06466772",
+    "title": "Precision Sensorimotor Neurorehabilitation Through Personalized Stimulation Loops",
+    "status": "RECRUITING",
+    "conditions": [
+      "Stroke"
+    ],
+    "patient_count": 462
+  },
+  {
+    "nct_id": "NCT06486012",
+    "title": "Regular Use of aPDT in the Management and Prevention of Periodontitis Symptoms in Diabetic Patients",
+    "status": "RECRUITING",
+    "conditions": [
+      "Diabetes Mellitus, Type 2",
+      "Pre-diabetes",
+      "Periodontal Diseases",
+      "Periodontitis"
+    ],
+    "patient_count": 1831
+  },
+  {
+    "nct_id": "NCT06488274",
+    "title": "Evolution of Functional Gastrointestinal Disorders in Infants Fed With a New Infant Formula",
+    "status": "RECRUITING",
+    "conditions": [
+      "Functional Gastrointestinal Disorders"
+    ],
+    "patient_count": 4
+  },
+  {
+    "nct_id": "NCT06491966",
+    "title": "Clinical Outcomes and Inflammatory Responses in Viral vs. Bacterial Sepsis",
+    "status": "RECRUITING",
+    "conditions": [
+      "Sepsis",
+      "Sepsis Bacterial",
+      "Viral Sepsis",
+      "Inflammatory Response",
+      "Cytokine Storm",
+      "COVID-19",
+      "MODS"
+    ],
+    "patient_count": 35
+  },
+  {
+    "nct_id": "NCT06545721",
+    "title": "Weight Cycling on Hyperandrogenemia and Insulin Resistance in Polycystic Ovary Syndrome",
+    "status": "RECRUITING",
+    "conditions": [
+      "Polycystic Ovary Syndrome"
+    ],
+    "patient_count": 279
+  },
+  {
+    "nct_id": "NCT06562582",
+    "title": "STunning in Acute Myocardial Infarction - BAS",
+    "status": "RECRUITING",
+    "conditions": [
+      "Myocardial Infarct"
+    ],
+    "patient_count": 774
+  },
+  {
+    "nct_id": "NCT06566911",
+    "title": "Voice Analysis for Monitoring Patients With Heart Failure",
+    "status": "RECRUITING",
+    "conditions": [
+      "Heart Failure"
+    ],
+    "patient_count": 28
+  },
+  {
+    "nct_id": "NCT06567990",
+    "title": "Type 2 DIAbeTes With NAFLD: innOvative Biomarkers of Disease progressioN and clInical outComes",
+    "status": "RECRUITING",
+    "conditions": [
+      "Metabolic Dysfunction-Associated Liver Disease"
+    ],
+    "patient_count": 106
+  },
+  {
+    "nct_id": "NCT06582784",
+    "title": "IMPACT (IMproving Proactive Approaches for Cancer Survivors' Mental Health Treatment)",
     "status": "RECRUITING",
     "conditions": [
       "Depression",
-      "Bipolar Affective Disorder",
-      "Schizophenia Disorder",
-      "Psychiatric &Amp;or Mood Disorder"
+      "Depressive Symptoms",
+      "Cancer"
     ],
-    "patient_count": 756
+    "patient_count": 2771
   },
   {
-    "nct_id": "NCT07003997",
-    "title": "JAK Signaling in Depression",
+    "nct_id": "NCT06626958",
+    "title": "Stress Ball Used in the Active Phase of Labor on Labor Pain and Birth Comfort",
     "status": "RECRUITING",
     "conditions": [
-      "Major Depressive Disorder"
+      "Labor Pain",
+      "Birth Order",
+      "Stress"
     ],
-    "patient_count": 756
+    "patient_count": 4
   },
   {
-    "nct_id": "NCT07026708",
-    "title": "TIRANA-ACS: A Prospective Registry Study for the Targeted Investigation of Residual Inflammation After Non-ST/ ST Elevation Acute Coronary Syndrome",
+    "nct_id": "NCT06634160",
+    "title": "Assessment of the Prevalence of Steatotic Liver Disease Associated With Metabolic Dysfunction in Patients With Heterozygous Familial Hypercholesterolemia",
     "status": "RECRUITING",
     "conditions": [
-      "ACS (Acute Coronary Syndrome)",
-      "Myocardial Infarction (MI)",
-      "Myocardial Inflammation",
-      "Inflammation Biomarkers",
-      "NSTEMI - Non-ST Segment Elevation MI",
-      "STEMI"
+      "Heterozygous Familial Hypercholesterolemia"
     ],
-    "patient_count": 247
+    "patient_count": 106
   },
   {
-    "nct_id": "NCT07330362",
-    "title": "The Clinical Application of Artificial Intelligence Assisted Renal Biopsy Diagnosis System.",
+    "nct_id": "NCT06657144",
+    "title": "A Study of CHS-114 (Tagmokitug) in Combination With Toripalimab and/or Other Treatments in Participants With Advanced Solid Tumors",
     "status": "RECRUITING",
     "conditions": [
-      "Chronic Glomerulonephritis",
-      "Chronic Kidney Disease"
+      "Metastatic Solid Tumor",
+      "Advanced Solid Tumor"
     ],
-    "patient_count": 169
+    "patient_count": 1009
+  },
+  {
+    "nct_id": "NCT06662890",
+    "title": "Heart Attack Blood Oxygen Therapy Trial",
+    "status": "RECRUITING",
+    "conditions": [
+      "Myocardial Infarct",
+      "Remodeling, Left Ventricle"
+    ],
+    "patient_count": 781
+  },
+  {
+    "nct_id": "NCT06702228",
+    "title": "Precision Diagnosis and Care for Families With Pulmonary Fibrosis in Ireland",
+    "status": "RECRUITING",
+    "conditions": [
+      "Connective Tissue Diseases",
+      "Interstitial Lung Disease",
+      "Idiopathic Pulmonary Fibrosis",
+      "Familial Idiopathic Pulmonary Fibrosis",
+      "Pulmonary Fibrosis",
+      "Pulmonary Fibrosis Interstitial"
+    ],
+    "patient_count": 135
+  },
+  {
+    "nct_id": "NCT06721312",
+    "title": "Continuous Heart Rate Variability Monitoring in Doctors; Understanding Patterns of Stress and Recovery and Their Relationship With Self-reported Resilience, Burnout and Wellbeing.",
+    "status": "RECRUITING",
+    "conditions": [
+      "Burnout",
+      "Burnout Syndrome",
+      "Occupational Stress",
+      "Stress"
+    ],
+    "patient_count": 48
+  },
+  {
+    "nct_id": "NCT06778239",
+    "title": "Childhood-Onset Essential Hypertension Natural History Study",
+    "status": "RECRUITING",
+    "conditions": [
+      "Hypertension",
+      "Essential Hypertension"
+    ],
+    "patient_count": 81
+  },
+  {
+    "nct_id": "NCT06902077",
+    "title": "A Low-Carb Approach to Treat Type 2 Diabetes in Pediatric Patients",
+    "status": "RECRUITING",
+    "conditions": [
+      "Type 2 Diabetes"
+    ],
+    "patient_count": 67
+  },
+  {
+    "nct_id": "NCT06960304",
+    "title": "Effect of a Structured Physical Exercise Program on Arteriovenous Fistula Maturation for Hemodialysis in Chronic Kidney Disease Patients",
+    "status": "RECRUITING",
+    "conditions": [
+      "Chronic Kidney Disease Requiring Hemodialysis"
+    ],
+    "patient_count": 478
+  },
+  {
+    "nct_id": "NCT06980636",
+    "title": "A Trial of Shengmai Liquid for Long COVID Fatigue.",
+    "status": "RECRUITING",
+    "conditions": [
+      "Long COVID Fatigue"
+    ],
+    "patient_count": 3
+  },
+  {
+    "nct_id": "NCT06989216",
+    "title": "Multi-modal Quantitative Imaging of the Skin",
+    "status": "RECRUITING",
+    "conditions": [
+      "Skin Cancer",
+      "Skin Diseases",
+      "Atopic Dermatitis",
+      "Psoriasis",
+      "Raynaud Disease",
+      "Diabetic Foot",
+      "Peripheral Arterial Disease"
+    ],
+    "patient_count": 986
+  },
+  {
+    "nct_id": "NCT06999577",
+    "title": "The Mechanism Versus PPI Trial",
+    "status": "RECRUITING",
+    "conditions": [
+      "Laryngopharyngeal Reflux",
+      "Cough",
+      "Throat Clearing",
+      "Dysphonia",
+      "Reflux"
+    ],
+    "patient_count": 7
+  },
+  {
+    "nct_id": "NCT07002216",
+    "title": "BrECADD Therapy in Stage 2 B-IV Hodgkin Lymphoma",
+    "status": "RECRUITING",
+    "conditions": [
+      "Hodgkin Lymphoma",
+      "Advanced Hodgkin Lymphoma"
+    ],
+    "patient_count": 67
+  },
+  {
+    "nct_id": "NCT07005362",
+    "title": "Fitbit and AI Chatbot in Sedentary Primary Care Patients With T2D",
+    "status": "RECRUITING",
+    "conditions": [
+      "Type 2 Diabetes",
+      "Type 2 Diabetes Mellitus (T2DM)",
+      "T2DM (Type 2 Diabetes Mellitus)",
+      "T2D",
+      "T2DM",
+      "Remote Patient Monitoring",
+      "Artificial Intelegence"
+    ],
+    "patient_count": 67
+  },
+  {
+    "nct_id": "NCT07083206",
+    "title": "A Study to Evaluate the Effectiveness and Safety of Fixed-Dose Combination of Pitavastatin/ Ezetimibe",
+    "status": "RECRUITING",
+    "conditions": [
+      "Hypercholesterolemia",
+      "Dyslipidemias"
+    ],
+    "patient_count": 2
+  },
+  {
+    "nct_id": "NCT07095517",
+    "title": "Pathways, Risk Factors, and mOleculeS to Prevent Early-onset Colorectal Tumors",
+    "status": "RECRUITING",
+    "conditions": [
+      "Colorectal Cancer Prevention",
+      "Colorectal Adenoma"
+    ],
+    "patient_count": 47
+  },
+  {
+    "nct_id": "NCT07102628",
+    "title": "Evaluation of Efficacy and Safety of Early in Hospital Initiation of Inclisiran Treatment in Patients With Acute Coronary Syndromes",
+    "status": "RECRUITING",
+    "conditions": [
+      "Acute Coronary Syndrome"
+    ],
+    "patient_count": 30
+  },
+  {
+    "nct_id": "NCT07126587",
+    "title": "Healthy Living Anson Study",
+    "status": "RECRUITING",
+    "conditions": [
+      "Obesity (Disorder)",
+      "Diabetes Type 2",
+      "Heart Disease",
+      "Hypertension",
+      "Cancer",
+      "High Cholesterol"
+    ],
+    "patient_count": 1204
+  },
+  {
+    "nct_id": "NCT07142512",
+    "title": "Helping Couples Communicate Better: Does This Help Persons With Type 2 Diabetes Respond Better to a Step Count Prescription?",
+    "status": "RECRUITING",
+    "conditions": [
+      "Type 2 Diabetes"
+    ],
+    "patient_count": 67
+  },
+  {
+    "nct_id": "NCT07153367",
+    "title": "Using a Fixed Dosage of Follitropin Delta for Ovarian Stimulation for Intrauterine Insemination: Rekovelle for Intrauterine Successful Experience (RISE)",
+    "status": "RECRUITING",
+    "conditions": [
+      "Infertility",
+      "Insemination"
+    ],
+    "patient_count": 11
+  },
+  {
+    "nct_id": "NCT07159880",
+    "title": "Letrozole Extended vs Traditional Therapy for Ovulation Induction in Women With PCOS (PROLEx-PCOS)",
+    "status": "RECRUITING",
+    "conditions": [
+      "PCOS (Polycystic Ovary Syndrome)",
+      "Infertility",
+      "Anovulation"
+    ],
+    "patient_count": 279
+  },
+  {
+    "nct_id": "NCT07171970",
+    "title": "IVM - Fresh ET (THE SAIGON PROTOCOL) Versus IVF - FET in PCOS Women",
+    "status": "RECRUITING",
+    "conditions": [
+      "Polycystic Ovary Syndrome (PCOS)",
+      "In Vitro Maturation of Oocytes",
+      "Fresh Embryo Transfer"
+    ],
+    "patient_count": 1
+  },
+  {
+    "nct_id": "NCT07189936",
+    "title": "Effect of 2-HOBA in Persistent Immune Activation in Long COVID POTS",
+    "status": "RECRUITING",
+    "conditions": [
+      "Post-Acute COVID-19 Syndrome",
+      "Postural Tachycardia Syndrome (POTS)",
+      "SARS CoV 2 Infection",
+      "Long COVID19"
+    ],
+    "patient_count": 80
+  },
+  {
+    "nct_id": "NCT07192783",
+    "title": "The Effect of Lavender Inhalation on Anxiety, Sleep, and Blood Pressure",
+    "status": "RECRUITING",
+    "conditions": [
+      "Primary Hypertension"
+    ],
+    "patient_count": 29
+  },
+  {
+    "nct_id": "NCT07231510",
+    "title": "Chlordecone Exposure and Female Fertility",
+    "status": "RECRUITING",
+    "conditions": [
+      "Infertility Female"
+    ],
+    "patient_count": 9
+  },
+  {
+    "nct_id": "NCT07321886",
+    "title": "A Study of Eloralintide (LY3841136) in Participants With Obesity, or Overweight Without Type 2 Diabetes",
+    "status": "RECRUITING",
+    "conditions": [
+      "Obesity",
+      "Overweight"
+    ],
+    "patient_count": 47
+  },
+  {
+    "nct_id": "NCT07403201",
+    "title": "The Effect of Therapy Combination in PCOS With Dlbs 3233",
+    "status": "RECRUITING",
+    "conditions": [
+      "Polycystic Ovary Syndrome"
+    ],
+    "patient_count": 279
+  },
+  {
+    "nct_id": "NCT07470723",
+    "title": "The ORIGIN-FH Study",
+    "status": "RECRUITING",
+    "conditions": [
+      "Heterozygous Familial Hypercholesterolemia (HeFH)",
+      "Homozygous Familial Hypercholesterolemia (HoFH)",
+      "Familial Hypercholesterolemia"
+    ],
+    "patient_count": 4
+  },
+  {
+    "nct_id": "NCT09804044",
+    "title": "Open-Label Trial of a Novel Intervention for Hypertension",
+    "status": "RECRUITING",
+    "conditions": [
+      "hypertension"
+    ],
+    "patient_count": 78
+  },
+  {
+    "nct_id": "NCT13721666",
+    "title": "Evaluating Treatment Outcomes in Patients With Chronic Gvhd",
+    "status": "RECRUITING",
+    "conditions": [
+      "chronic gvhd"
+    ],
+    "patient_count": 69
+  },
+  {
+    "nct_id": "NCT16205639",
+    "title": "Randomized Controlled Trial for the Management of Stroke",
+    "status": "RECRUITING",
+    "conditions": [
+      "obesity",
+      "stroke"
+    ],
+    "patient_count": 508
+  },
+  {
+    "nct_id": "NCT22834411",
+    "title": "Evaluating Treatment Outcomes in Patients With Myocardial Infarction",
+    "status": "RECRUITING",
+    "conditions": [
+      "myocardial infarction"
+    ],
+    "patient_count": 774
+  },
+  {
+    "nct_id": "NCT31227444",
+    "title": "Open-Label Trial of a Novel Intervention for Myocardial Infarction",
+    "status": "RECRUITING",
+    "conditions": [
+      "diabetes mellitus",
+      "myocardial infarction"
+    ],
+    "patient_count": 2267
+  },
+  {
+    "nct_id": "NCT36804517",
+    "title": "Safety and Efficacy Study in Myocardial Infarction",
+    "status": "RECRUITING",
+    "conditions": [
+      "diabetes mellitus",
+      "myocardial infarction"
+    ],
+    "patient_count": 2267
+  },
+  {
+    "nct_id": "NCT37806578",
+    "title": "A Study of an Investigational Therapy for Myocardial Infarction",
+    "status": "RECRUITING",
+    "conditions": [
+      "arthritis",
+      "chronic kidney disease",
+      "diabetes mellitus",
+      "myocardial infarction",
+      "skin cancer"
+    ],
+    "patient_count": 5155
+  },
+  {
+    "nct_id": "NCT41674822",
+    "title": "Safety and Efficacy Study in Chronic Gvhd",
+    "status": "RECRUITING",
+    "conditions": [
+      "chronic gvhd"
+    ],
+    "patient_count": 69
+  },
+  {
+    "nct_id": "NCT44750282",
+    "title": "Randomized Controlled Trial for the Management of Myocardial Infarction",
+    "status": "RECRUITING",
+    "conditions": [
+      "diabetes mellitus",
+      "myocardial infarction"
+    ],
+    "patient_count": 2267
+  },
+  {
+    "nct_id": "NCT46153778",
+    "title": "Safety and Efficacy Study in Asthma",
+    "status": "RECRUITING",
+    "conditions": [
+      "asthma"
+    ],
+    "patient_count": 1483
+  },
+  {
+    "nct_id": "NCT48920381",
+    "title": "Evaluating Treatment Outcomes in Patients With Stroke",
+    "status": "RECRUITING",
+    "conditions": [
+      "obesity",
+      "stroke"
+    ],
+    "patient_count": 508
+  },
+  {
+    "nct_id": "NCT50831925",
+    "title": "Open-Label Trial of a Novel Intervention for Asthma",
+    "status": "RECRUITING",
+    "conditions": [
+      "asthma",
+      "hypertension"
+    ],
+    "patient_count": 1560
+  },
+  {
+    "nct_id": "NCT53340137",
+    "title": "Randomized Controlled Trial for the Management of Lymphoma",
+    "status": "RECRUITING",
+    "conditions": [
+      "lymphoma"
+    ],
+    "patient_count": 77
+  },
+  {
+    "nct_id": "NCT61858143",
+    "title": "A Study of an Investigational Therapy for Hodgkin Lymphoma",
+    "status": "RECRUITING",
+    "conditions": [
+      "hodgkin lymphoma"
+    ],
+    "patient_count": 67
+  },
+  {
+    "nct_id": "NCT81143886",
+    "title": "A Study of an Investigational Therapy for Asthma",
+    "status": "RECRUITING",
+    "conditions": [
+      "asthma",
+      "diabetes mellitus"
+    ],
+    "patient_count": 2870
+  },
+  {
+    "nct_id": "NCT92899614",
+    "title": "Open-Label Trial of a Novel Intervention for Hypertension",
+    "status": "RECRUITING",
+    "conditions": [
+      "hypertension"
+    ],
+    "patient_count": 78
   }
 ]

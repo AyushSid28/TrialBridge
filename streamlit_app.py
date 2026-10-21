@@ -9,12 +9,20 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-API_URL = os.getenv("TRIALBRIDGE_API_URL", "http://localhost:8000").rstrip("/")
-API_BASE = f"{API_URL}/api/v1/agents"
-API_KEY = os.getenv("API_KEY", "")
+def _get_env_or_secret(key: str, default: str = "") -> str:
+    try:
+        if hasattr(st, "secrets") and key in st.secrets:
+            return str(st.secrets[key])
+    except Exception:
+        pass
+    return os.getenv(key, default)
+
+API_URL = _get_env_or_secret("TRIALBRIDGE_API_URL", "http://localhost:8000").rstrip("/")
+API_BASE = _get_env_or_secret("API_BASE", f"{API_URL}/api/v1/agents")
+API_KEY = _get_env_or_secret("API_KEY", "")
 API_HEADERS = {"X-API-Key": API_KEY}
 
-st.set_page_config(page_title="TrialBridge", layout="wide", page_icon="T")
+st.set_page_config(page_title="TrialBridge", layout="wide", page_icon="🧬")
 
 # ── Palette ──────────────────────────────────────────────────────────────
 _BG         = "#0C1117"
@@ -63,7 +71,7 @@ TRIAL_OPTIONS = {
     for t in VALID_TRIALS
 }
 DEFAULT_TRIAL_IDX = next(
-    (i for i, t in enumerate(VALID_TRIALS) if t["nct_id"] == "NCT06230718"), 0
+    (i for i, t in enumerate(VALID_TRIALS) if t["nct_id"] == "NCT05369065"), 0
 )
 
 # ── Global styles ────────────────────────────────────────────────────────
@@ -459,7 +467,7 @@ if not API_KEY:
     )
 
 st.markdown("# TrialBridge")
-st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.85rem;">Patient screening for clinical trials</span>', unsafe_allow_html=True)
+st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.85rem;">AI-Powered Clinical Trial Patient Matching Platform</span>', unsafe_allow_html=True)
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 
 # ── Input ────────────────────────────────────────────────────────────────
