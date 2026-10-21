@@ -567,6 +567,8 @@ if score_btn:
                 cats = ["Condition", "Age", "Sex", "Geography", "Health"]
                 vals = [bd["condition"]["score"], bd["age"]["score"], bd["sex"]["score"], bd["geography"]["score"], bd["health"]["score"]]
                 maxv = [bd["condition"]["max"], bd["age"]["max"], bd["sex"]["max"], bd["geography"]["max"], bd["health"]["max"]]
+                # Give the outer ring a little headroom above the largest weight.
+                radar_max = max(maxv) * 1.15 if maxv else 1
                 fig_r = go.Figure()
                 fig_r.add_trace(go.Scatterpolar(
                     r=maxv + [maxv[0]], theta=cats + [cats[0]],
@@ -582,7 +584,7 @@ if score_btn:
                     **PLOTLY_LAYOUT, height=300, showlegend=False,
                     polar=dict(
                         bgcolor="rgba(0,0,0,0)",
-                        radialaxis=dict(visible=True, range=[0, 35], gridcolor=_BORDER, color=_TEXT_DIM, tickfont=dict(size=10)),
+                        radialaxis=dict(visible=True, range=[0, radar_max], gridcolor=_BORDER, color=_TEXT_DIM, tickfont=dict(size=10)),
                         angularaxis=dict(gridcolor=_BORDER, color=_TEXT_DIM),
                     ),
                 )
