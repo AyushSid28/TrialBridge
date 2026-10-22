@@ -787,9 +787,9 @@ class ScoringAgent:
             t2 = time.perf_counter()
             patients, patient_ids = await self.orchestrator.match_patients(
                 search_query=criteria["search_query"],
-                sex=criteria["sex"],
-                min_age=criteria["min_age"],
-                max_age=criteria["max_age"],
+                sex="ALL",
+                min_age=None,
+                max_age=None,
                 limit=limit,
                 prefilter_patient_ids=prefiltered_ids if prefiltered_ids else None,
                 source=source,
@@ -798,9 +798,9 @@ class ScoringAgent:
             if used_prefilter and not patients:
                 patients, patient_ids = await self.orchestrator.match_patients(
                     search_query=criteria["search_query"],
-                    sex=criteria["sex"],
-                    min_age=criteria["min_age"],
-                    max_age=criteria["max_age"],
+                    sex="ALL",
+                    min_age=None,
+                    max_age=None,
                     limit=limit,
                     source=source,
                 )

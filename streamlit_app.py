@@ -8,6 +8,9 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def _get_env_or_secret(key: str, default: str = "") -> str:
     try:
@@ -25,23 +28,23 @@ API_HEADERS = {"X-API-Key": API_KEY}
 st.set_page_config(page_title="TrialBridge", layout="wide", page_icon="🧬")
 
 # ── Palette ──────────────────────────────────────────────────────────────
-_BG         = "#0C1117"
-_SURFACE    = "#141C24"
-_SURFACE_HI = "#1B2530"
-_BORDER     = "#243040"
-_TEXT        = "#D8DEE4"
-_TEXT_DIM    = "#7B8794"
-_ACCENT      = "#5A9E94"   # teal
-_ACCENT_DIM  = "#3D6E66"
-_WARM        = "#C8965A"   # amber
-_RED         = "#C06058"   # muted coral
-_GREEN       = "#5A9E6A"
+_BG         = "#0B0F17"
+_SURFACE    = "#111827"
+_SURFACE_HI = "#1E293B"
+_BORDER     = "#263548"
+_TEXT        = "#F1F5F9"
+_TEXT_DIM    = "#94A3B8"
+_ACCENT      = "#14B8A6"   # vibrant clinical teal
+_ACCENT_DIM  = "#0F766E"
+_WARM        = "#F59E0B"   # amber
+_RED         = "#F43F5E"   # rose / disqualified
+_GREEN       = "#10B981"   # emerald / eligible
 
 # ── Plotly theme ─────────────────────────────────────────────────────────
 PLOTLY_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="Figtree, sans-serif", color=_TEXT_DIM, size=12),
+    font=dict(family="Inter, sans-serif", color=_TEXT_DIM, size=12),
     margin=dict(l=0, r=0, t=32, b=0),
     xaxis=dict(gridcolor=_BORDER, zerolinecolor=_BORDER),
     yaxis=dict(gridcolor=_BORDER, zerolinecolor=_BORDER),
@@ -77,14 +80,14 @@ DEFAULT_TRIAL_IDX = next(
 # ── Global styles ────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Overpass+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ---- base ---- */
 html, body, [class*="css"] {{
-    font-family: 'Figtree', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }}
 .block-container {{
-    padding-top: 2rem;
+    padding-top: 1.8rem;
     padding-bottom: 2rem;
     max-width: 1200px;
 }}
@@ -96,49 +99,63 @@ html, body, [class*="css"] {{
 h1 {{
     font-weight: 700 !important;
     letter-spacing: -0.03em !important;
-    font-size: 1.75rem !important;
+    font-size: 1.85rem !important;
     color: {_TEXT} !important;
+    background: linear-gradient(135deg, #F8FAFC 30%, #94A3B8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }}
 h2 {{
     font-weight: 600 !important;
     letter-spacing: -0.02em !important;
-    font-size: 1.2rem !important;
+    font-size: 1.25rem !important;
     color: {_TEXT} !important;
     margin-top: 1.5rem !important;
 }}
 h3 {{
     font-weight: 600 !important;
-    font-size: 1rem !important;
+    font-size: 0.82rem !important;
     color: {_TEXT_DIM} !important;
     text-transform: uppercase;
-    letter-spacing: 0.06em !important;
-    font-size: 0.75rem !important;
+    letter-spacing: 0.08em !important;
 }}
 
 /* ---- stat blocks ---- */
 .stat-row {{
-    display: flex;
-    gap: 1px;
-    background: {_BORDER};
-    border-radius: 8px;
-    overflow: hidden;
-    margin: 1rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin: 1.25rem 0;
 }}
 .stat-cell {{
-    flex: 1;
-    background: {_SURFACE};
-    padding: 1rem 1.2rem;
+    background: linear-gradient(145deg, #121926, #1A2434);
+    border: 1px solid #233142;
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
     text-align: left;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }}
-.stat-cell:first-child {{
-    border-radius: 8px 0 0 8px;
+.stat-cell:hover {{
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }}
-.stat-cell:last-child {{
-    border-radius: 0 8px 8px 0;
+.stat-cell.accent-cell {{
+    border-top: 3px solid {_ACCENT};
 }}
+.stat-cell.red-cell {{
+    border-top: 3px solid {_RED};
+}}
+.stat-cell.warm-cell {{
+    border-top: 3px solid {_WARM};
+}}
+.stat-cell.green-cell {{
+    border-top: 3px solid {_GREEN};
+}}
+
 .stat-val {{
-    font-family: 'Overpass Mono', monospace;
-    font-size: 1.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.7rem;
     font-weight: 600;
     line-height: 1.1;
     color: {_TEXT};
@@ -149,18 +166,19 @@ h3 {{
 .stat-val.green  {{ color: {_GREEN}; }}
 .stat-label {{
     font-size: 0.7rem;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: {_TEXT_DIM};
-    margin-top: 0.3rem;
+    margin-top: 0.35rem;
 }}
 
 /* ---- tag pills ---- */
 .tag {{
     display: inline-block;
-    padding: 0.15rem 0.5rem;
-    border-radius: 3px;
-    font-size: 0.72rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.74rem;
     font-weight: 500;
     letter-spacing: 0.02em;
     margin-right: 0.3rem;
@@ -169,39 +187,43 @@ h3 {{
     color: {_TEXT_DIM};
     border: 1px solid {_BORDER};
 }}
-.tag.teal {{ background: rgba(90,158,148,0.12); color: {_ACCENT}; border-color: rgba(90,158,148,0.25); }}
-.tag.warm {{ background: rgba(200,150,90,0.12); color: {_WARM}; border-color: rgba(200,150,90,0.25); }}
-.tag.red  {{ background: rgba(192,96,88,0.12); color: {_RED}; border-color: rgba(192,96,88,0.25); }}
+.tag.teal {{ background: rgba(20,184,166,0.12); color: {_ACCENT}; border-color: rgba(20,184,166,0.3); }}
+.tag.warm {{ background: rgba(245,158,11,0.12); color: {_WARM}; border-color: rgba(245,158,11,0.3); }}
+.tag.red  {{ background: rgba(244,63,94,0.14); color: {_RED}; border-color: rgba(244,63,94,0.35); }}
 
 /* ---- section divider ---- */
 .section-rule {{
     border: none;
     border-top: 1px solid {_BORDER};
-    margin: 2rem 0 1.5rem 0;
+    margin: 1.75rem 0 1.25rem 0;
 }}
 
 /* ---- criteria panel ---- */
 .criteria-panel {{
-    background: {_SURFACE};
-    border: 1px solid {_BORDER};
-    border-radius: 8px;
-    padding: 1rem 1.2rem;
-    margin: 0.75rem 0;
-    font-size: 0.85rem;
+    background: linear-gradient(135deg, rgba(18, 25, 38, 0.85), rgba(15, 23, 42, 0.7));
+    border: 1px solid rgba(38, 53, 72, 0.85);
+    border-left: 3px solid {_ACCENT};
+    border-radius: 10px;
+    padding: 1.1rem 1.35rem;
+    margin: 0.85rem 0;
+    font-size: 0.86rem;
     color: {_TEXT_DIM};
-    line-height: 1.6;
+    line-height: 1.65;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
 }}
 .criteria-panel strong {{
     color: {_TEXT};
-    font-weight: 500;
+    font-weight: 600;
 }}
 .criteria-panel code {{
-    font-family: 'Overpass Mono', monospace;
-    font-size: 0.78rem;
-    background: {_SURFACE_HI};
-    padding: 0.1rem 0.35rem;
-    border-radius: 3px;
-    color: {_ACCENT};
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    background: rgba(20, 184, 166, 0.1);
+    border: 1px solid rgba(20, 184, 166, 0.25);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    color: #2DD4BF;
 }}
 
 /* ---- patient detail panel ---- */
@@ -272,33 +294,52 @@ div[data-baseweb="radio"] label {{
     font-size: 0.85rem !important;
 }}
 button[data-baseweb="tab"] {{
-    font-size: 0.8rem !important;
-    letter-spacing: 0.03em;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em;
+    padding: 0.6rem 1.1rem !important;
+    border-radius: 6px 6px 0 0 !important;
+    transition: color 0.2s ease;
+}}
+button[data-baseweb="tab"][aria-selected="true"] {{
+    color: {_ACCENT} !important;
+    border-bottom: 2px solid {_ACCENT} !important;
 }}
 
 /* ---- button ---- */
 .stButton > button[kind="primary"] {{
-    background: {_ACCENT} !important;
+    background: linear-gradient(135deg, {_ACCENT}, {_ACCENT_DIM}) !important;
     border: none !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
     font-weight: 600 !important;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
+    padding: 0.55rem 1.5rem !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 14px rgba(20, 184, 166, 0.35);
+    transition: all 0.2s ease !important;
 }}
 .stButton > button[kind="primary"]:hover {{
-    background: {_ACCENT_DIM} !important;
+    background: linear-gradient(135deg, #0D9488, #0F766E) !important;
+    box-shadow: 0 6px 22px rgba(20, 184, 166, 0.5);
+    transform: translateY(-1px);
 }}
 
 /* ---- expander ---- */
 .streamlit-expanderHeader {{
     font-size: 0.85rem !important;
-    font-weight: 500 !important;
-    color: {_TEXT_DIM} !important;
+    font-weight: 600 !important;
+    color: {_TEXT} !important;
+    background: {_SURFACE} !important;
+    border-radius: 6px !important;
 }}
 
 /* ---- dataframe ---- */
 .stDataFrame {{
     border: 1px solid {_BORDER} !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
     overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }}
 
 /* ---- spinner ---- */
@@ -308,7 +349,7 @@ button[data-baseweb="tab"] {{
 
 /* ---- hide metric label padding ---- */
 [data-testid="stMetricValue"] {{
-    font-family: 'Overpass Mono', monospace !important;
+    font-family: 'JetBrains Mono', monospace !important;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -358,8 +399,9 @@ def stat_row(cells: list[tuple[str, str, str]]):
     """Render a row of stat cells. Each tuple: (value, label, color_class)."""
     inner = ""
     for val, label, cls in cells:
+        top_cls = f"{cls}-cell" if cls else ""
         inner += (
-            f'<div class="stat-cell"><div class="stat-val {cls}">{html.escape(str(val))}</div>'
+            f'<div class="stat-cell {top_cls}"><div class="stat-val {cls}">{html.escape(str(val))}</div>'
             f'<div class="stat-label">{html.escape(str(label))}</div></div>'
         )
     st.markdown(f'<div class="stat-row">{inner}</div>', unsafe_allow_html=True)
@@ -388,12 +430,18 @@ def render_criteria(result):
     if llm:
         lines.append(f'<strong>Interpreted query</strong> <code>{crit["search_query"]}</code>')
         parts = []
-        if crit["sex_filter"] != "ALL":
+        if crit.get("sex_filter"):
             parts.append(f'Sex: {crit["sex_filter"]}')
         age_min = crit["age_range"]["min"]
         age_max = crit["age_range"]["max"]
-        if age_min or age_max:
-            parts.append(f'Age: {age_min or "?"}&ndash;{age_max or "?"}')
+        if age_min and age_max:
+            parts.append(f'Age: {age_min}&ndash;{age_max}')
+        elif age_min:
+            parts.append(f'Age: &ge; {age_min}')
+        elif age_max:
+            parts.append(f'Age: &le; {age_max}')
+        else:
+            parts.append('Age: All ages')
         if llm.get("min_bmi") or llm.get("max_bmi"):
             parts.append(f'BMI: {llm.get("min_bmi") or "?"}&ndash;{llm.get("max_bmi") or "?"}')
         if llm.get("smoker_status"):
@@ -509,19 +557,21 @@ score_btn = st.button("Run Scoring", type="primary", key="score_btn", use_contai
 
 if not score_btn:
     st.markdown(f"""
-    <div style="margin: 3rem auto; max-width: 520px; text-align: center;">
-        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🔬</div>
-        <div style="font-size: 1.1rem; font-weight: 600; color: {_TEXT}; margin-bottom: 0.5rem;">
-            Ready to screen patients
+    <div style="margin: 3.5rem auto; max-width: 580px; text-align: center; padding: 2.5rem 2rem;
+                background: linear-gradient(145deg, #121926, #1A2434); border: 1px solid #233142;
+                border-radius: 16px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);">
+        <div style="font-size: 2.8rem; margin-bottom: 0.85rem;">🧬</div>
+        <div style="font-size: 1.25rem; font-weight: 700; color: {_TEXT}; margin-bottom: 0.6rem; letter-spacing: -0.02em;">
+            Ready to Screen &amp; Rank Patients
         </div>
-        <div style="font-size: 0.85rem; color: {_TEXT_DIM}; line-height: 1.6; margin-bottom: 1.5rem;">
-            Select a clinical trial above, then hit
-            <strong style="color:{_ACCENT};">Run Scoring</strong> to match and rank patients.
+        <div style="font-size: 0.88rem; color: {_TEXT_DIM}; line-height: 1.6; margin-bottom: 2rem;">
+            Select a target clinical trial protocol above and hit
+            <strong style="color:{_ACCENT}; font-weight: 600;">Run Scoring</strong> to evaluate candidate matches against inclusion and exclusion criteria.
         </div>
-        <div style="display: flex; justify-content: center; gap: 2rem; font-size: 0.75rem; color: {_TEXT_DIM};">
-            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">1️⃣</span>Select Trial</div>
-            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">2️⃣</span>Set Patient Limit</div>
-            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">3️⃣</span>Run Scoring</div>
+        <div style="display: flex; justify-content: center; gap: 2.5rem; font-size: 0.78rem; color: {_TEXT_DIM};">
+            <div style="text-align: center;"><span style="display:block; font-size:1.4rem; margin-bottom:0.35rem;">1️⃣</span><span style="font-weight: 500;">Select Protocol</span></div>
+            <div style="text-align: center;"><span style="display:block; font-size:1.4rem; margin-bottom:0.35rem;">2️⃣</span><span style="font-weight: 500;">Set Cohort Size</span></div>
+            <div style="text-align: center;"><span style="display:block; font-size:1.4rem; margin-bottom:0.35rem;">3️⃣</span><span style="font-weight: 500;">Analyze &amp; Score</span></div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -691,9 +741,14 @@ if score_btn:
 
         # ── Patient table ────────────────────────────────────────────
         st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
-        st.markdown("### Ranked Patients")
+        st.markdown("### Patient Evaluation")
 
-        t_elig, t_excl, t_raw = st.tabs(["Eligible", "Excluded", "Raw"])
+        excl_patients = [p for p in patients if p["excluded"]]
+        t_elig, t_excl, t_raw = st.tabs([
+            f"🏆 Eligible Candidates ({len(eligible_patients)})",
+            f"🚫 Disqualified / Excluded ({len(excl_patients)})",
+            "📋 Raw Audit JSON",
+        ])
         with t_elig:
             if eligible_patients:
                 rows = []
@@ -730,17 +785,30 @@ if score_btn:
                     key="download_csv",
                 )
             else:
-                st.info("No eligible patients.")
+                st.info("No eligible patients matched this trial.")
         with t_excl:
-            excl = [p for p in patients if p["excluded"]]
-            if excl:
-                st.dataframe(pd.DataFrame([{
-                    "Patient": p.get("display_patient_id") or p["patient_id"][:8],
-                    "Conditions": ", ".join(p["patient_summary"].get("conditions") or []),
-                    "Reasons": "; ".join(p["exclusion_reasons"]),
-                } for p in excl]), use_container_width=True)
+            if excl_patients:
+                st.markdown(
+                    f'<div style="padding: 0.85rem 1.1rem; border-radius: 8px; background: rgba(244,63,94,0.08); '
+                    f'border: 1px solid rgba(244,63,94,0.25); color: #FDA4AF; font-size: 0.86rem; margin-bottom: 1rem;">'
+                    f'<strong>🚫 {len(excl_patients)} candidate patients were screened and disqualified</strong> '
+                    f'based on protocol exclusion rules (contraindicated conditions, age cutoffs, or demographic constraints).'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+                excl_rows = []
+                for p in excl_patients:
+                    ps = p.get("patient_summary", {})
+                    excl_rows.append({
+                        "Patient ID": p.get("display_patient_id") or p["patient_id"][:8],
+                        "Age": ps.get("age", "?"),
+                        "Gender": ps.get("gender", "?"),
+                        "Conditions": ", ".join(ps.get("conditions") or []),
+                        "Disqualification Reasons": " • ".join(p.get("exclusion_reasons", [])),
+                    })
+                st.dataframe(pd.DataFrame(excl_rows), use_container_width=True, height=400)
             else:
-                st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.85rem;">No patients excluded.</span>', unsafe_allow_html=True)
+                st.markdown(f'<div style="padding: 0.9rem; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid {_BORDER}; color: {_TEXT_DIM}; font-size: 0.85rem;">No candidate patients were disqualified for this trial.</div>', unsafe_allow_html=True)
         with t_raw:
             st.json(data)
 
