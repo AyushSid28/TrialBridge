@@ -25,7 +25,7 @@ API_BASE = _get_env_or_secret("API_BASE", f"{API_URL}/api/v1/agents")
 API_KEY = _get_env_or_secret("API_KEY", "")
 API_HEADERS = {"X-API-Key": API_KEY}
 
-st.set_page_config(page_title="TrialBridge", layout="wide", page_icon="🧬")
+st.set_page_config(page_title="TrialBridge", layout="wide")
 
 # ── Palette ──────────────────────────────────────────────────────────────
 _BG         = "#0B0F17"
@@ -545,6 +545,15 @@ else:
         help="Choose the clinical trial whose eligibility criteria will be used to score and rank patients.",
     )
     score_trial_id = TRIAL_OPTIONS.get(label, "")
+    selected_trial_info = next((t for t in VALID_TRIALS if t["nct_id"] == score_trial_id), None)
+    if selected_trial_info:
+        conds_str = ", ".join(selected_trial_info.get("conditions", [])[:3])
+        oc1.markdown(
+            f'<div style="font-size:0.79rem; color:{_TEXT_DIM}; margin-top:-0.3rem; margin-bottom:0.5rem; line-height: 1.4;">'
+            f'<strong>Protocol Scope:</strong> {html.escape(selected_trial_info.get("title", ""))} &bull; <em>Indications: {html.escape(conds_str or "General")}</em>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
 score_limit = oc2.slider(
     "Max patients", 10, 500, 200,
     key="score_limit",
@@ -560,18 +569,20 @@ if not score_btn:
     <div style="margin: 3.5rem auto; max-width: 580px; text-align: center; padding: 2.5rem 2rem;
                 background: linear-gradient(145deg, #121926, #1A2434); border: 1px solid #233142;
                 border-radius: 16px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);">
-        <div style="font-size: 2.8rem; margin-bottom: 0.85rem;">🧬</div>
+        <div style="font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: {_ACCENT}; margin-bottom: 0.8rem;">
+            Protocol Screening Pipeline
+        </div>
         <div style="font-size: 1.25rem; font-weight: 700; color: {_TEXT}; margin-bottom: 0.6rem; letter-spacing: -0.02em;">
-            Ready to Screen &amp; Rank Patients
+            Ready to Screen and Rank Patients
         </div>
         <div style="font-size: 0.88rem; color: {_TEXT_DIM}; line-height: 1.6; margin-bottom: 2rem;">
             Select a target clinical trial protocol above and hit
             <strong style="color:{_ACCENT}; font-weight: 600;">Run Scoring</strong> to evaluate candidate matches against inclusion and exclusion criteria.
         </div>
         <div style="display: flex; justify-content: center; gap: 2.5rem; font-size: 0.78rem; color: {_TEXT_DIM};">
-            <div style="text-align: center;"><span style="display:block; font-size:1.4rem; margin-bottom:0.35rem;">1️⃣</span><span style="font-weight: 500;">Select Protocol</span></div>
-            <div style="text-align: center;"><span style="display:block; font-size:1.4rem; margin-bottom:0.35rem;">2️⃣</span><span style="font-weight: 500;">Set Cohort Size</span></div>
-            <div style="text-align: center;"><span style="display:block; font-size:1.4rem; margin-bottom:0.35rem;">3️⃣</span><span style="font-weight: 500;">Analyze &amp; Score</span></div>
+            <div style="text-align: center;"><span style="display:block; font-size:1.1rem; font-weight:700; color:{_ACCENT}; margin-bottom:0.25rem;">[1]</span><span style="font-weight: 500;">Select Protocol</span></div>
+            <div style="text-align: center;"><span style="display:block; font-size:1.1rem; font-weight:700; color:{_ACCENT}; margin-bottom:0.25rem;">[2]</span><span style="font-weight: 500;">Set Cohort Size</span></div>
+            <div style="text-align: center;"><span style="display:block; font-size:1.1rem; font-weight:700; color:{_ACCENT}; margin-bottom:0.25rem;">[3]</span><span style="font-weight: 500;">Analyze &amp; Score</span></div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -597,10 +608,18 @@ if score_btn:
         if status:
             header_parts.append(f'<span class="tag">{html.escape(str(status))}</span>')
         run_time = datetime.now().strftime("%b %d, %Y  %H:%M")
-        header_parts.append(f'<span class="tag warm">⏱ {run_time}</span>')
+        header_parts.append(f'<span class="tag warm">Evaluated: {run_time}</span>')
         st.markdown(f'## {html.escape(str(title))}', unsafe_allow_html=True)
         if header_parts:
             st.markdown(" ".join(header_parts), unsafe_allow_html=True)
+
+        crit_conds = ", ".join(data.get("criteria_used", {}).get("conditions", [])) or "target indications"
+        st.markdown(
+            f'<div style="margin: 0.6rem 0 1rem 0; padding: 0.65rem 0.95rem; border-radius: 6px; background: rgba(30, 41, 59, 0.45); border-left: 3px solid {_ACCENT}; font-size: 0.84rem; color: {_TEXT};">'
+            f'<strong>Study Objective:</strong> Evaluates therapeutic eligibility and clinical profile matching for patients presenting with {html.escape(crit_conds)}.'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
 
         # ── Key metrics ──────────────────────────────────────────────
         stat_row([
@@ -745,9 +764,9 @@ if score_btn:
 
         excl_patients = [p for p in patients if p["excluded"]]
         t_elig, t_excl, t_raw = st.tabs([
-            f"🏆 Eligible Candidates ({len(eligible_patients)})",
-            f"🚫 Disqualified / Excluded ({len(excl_patients)})",
-            "📋 Raw Audit JSON",
+            f"Eligible Candidates ({len(eligible_patients)})",
+            f"Disqualified / Excluded ({len(excl_patients)})",
+            "Raw Audit JSON",
         ])
         with t_elig:
             if eligible_patients:
@@ -778,7 +797,7 @@ if score_btn:
                 )
                 csv_data = df.to_csv(index=False).encode("utf-8")
                 st.download_button(
-                    label="📥 Export eligible patients (CSV)",
+                    label="Export eligible patients (CSV)",
                     data=csv_data,
                     file_name="eligible_patients.csv",
                     mime="text/csv",
@@ -791,7 +810,7 @@ if score_btn:
                 st.markdown(
                     f'<div style="padding: 0.85rem 1.1rem; border-radius: 8px; background: rgba(244,63,94,0.08); '
                     f'border: 1px solid rgba(244,63,94,0.25); color: #FDA4AF; font-size: 0.86rem; margin-bottom: 1rem;">'
-                    f'<strong>🚫 {len(excl_patients)} candidate patients were screened and disqualified</strong> '
+                    f'<strong>{len(excl_patients)} candidate patients were screened and disqualified</strong> '
                     f'based on protocol exclusion rules (contraindicated conditions, age cutoffs, or demographic constraints).'
                     f'</div>',
                     unsafe_allow_html=True,
