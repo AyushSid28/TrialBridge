@@ -410,7 +410,16 @@ def render_criteria(result):
             lines.append(f'<strong>Keywords</strong> {html.escape(kws)}')
         lines.append(f'<strong>Query</strong> <code>{crit["search_query"]}</code>')
         parts = [f'Sex: {crit["sex_filter"]}']
-        parts.append(f'Age: {crit["age_range"]["min"] or "?"}&ndash;{crit["age_range"]["max"] or "?"}')
+        a_min = crit["age_range"]["min"]
+        a_max = crit["age_range"]["max"]
+        if a_min and a_max:
+            parts.append(f'Age: {a_min}&ndash;{a_max}')
+        elif a_min:
+            parts.append(f'Age: &ge; {a_min}')
+        elif a_max:
+            parts.append(f'Age: &le; {a_max}')
+        else:
+            parts.append('Age: All ages')
         lines.append(f'<strong>Filters</strong> {" &middot; ".join(parts)}')
 
     body = "<br>".join(lines)

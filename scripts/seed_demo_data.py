@@ -93,7 +93,12 @@ async def seed_trials_if_needed(session) -> int:
             "eligibility": {
                 "sex": "ALL",
                 "healthyVolunteers": False,
-                "eligibilityCriteria": f"Inclusion Criteria:\n- Diagnosis of {', '.join(conditions)}\n- Age 18 and older\n\nExclusion Criteria:\n- Severe end-stage complications",
+                "minimumAge": "18 Years",
+                "maximumAge": "70 Years",
+                "eligibilityCriteria": (
+                    f"Inclusion Criteria:\n- Diagnosis of {', '.join(conditions)}\n- Age 18 to 70 Years\n\n"
+                    "Exclusion Criteria:\n- History of Stroke\n- Active Malignancy or Cancer\n- Severe Chronic Kidney Disease"
+                ),
             },
             "source": "ClinicalTrials.gov",
             "region": "US",

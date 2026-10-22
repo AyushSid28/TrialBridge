@@ -468,22 +468,38 @@ class ScoringAgent:
     def _check_exclusions(
         self, patient: dict, patient_db: dict, parsed: dict,
         trial_conditions: list[str] | None = None,
+        criteria: dict | None = None,
     ) -> tuple[bool, list[str]]:
-        excluded_terms = parsed.get("excluded_conditions", [])
-        if not excluded_terms:
-            return False, []
-
-        # Don't exclude patients for having the trial's own target conditions
-        trial_conds_lower = {c.lower() for c in (trial_conditions or [])}
-
-        patient_conds = [c.lower() for c in (patient.get("conditions") or [])]
         reasons = []
+
+        # 1. Condition-based exclusions
+        excluded_terms = parsed.get("excluded_conditions", [])
+        trial_conds_lower = {c.lower() for c in (trial_conditions or [])}
+        patient_conds = [c.lower() for c in (patient.get("conditions") or [])]
+
         for term in excluded_terms:
             if term in trial_conds_lower:
                 continue
             for pc in patient_conds:
                 if term in pc or pc in term:
                     reasons.append(f"Has excluded condition '{pc}' (rule: {term})")
+
+        # 2. Hard demographic boundaries (Age / Sex)
+        if criteria:
+            p_age = patient.get("age")
+            min_age = criteria.get("min_age")
+            max_age = criteria.get("max_age")
+            if p_age is not None:
+                if min_age is not None and p_age < min_age:
+                    reasons.append(f"Age {p_age} is below minimum requirement ({min_age})")
+                if max_age is not None and p_age > max_age:
+                    reasons.append(f"Age {p_age} exceeds maximum requirement ({max_age})")
+
+            req_sex = (criteria.get("sex") or "ALL").upper()
+            p_gender = (patient.get("gender") or "").upper()
+            if req_sex != "ALL" and p_gender and p_gender != req_sex:
+                reasons.append(f"Gender '{patient.get('gender')}' does not match required sex '{criteria.get('sex')}'")
+
         return bool(reasons), reasons
 
     def score_patient(
@@ -495,7 +511,7 @@ class ScoringAgent:
         trial_icd10: set[str],
     ) -> dict:
         excluded, reasons = self._check_exclusions(
-            patient, patient_db, parsed, trial_conditions=criteria["conditions"]
+            patient, patient_db, parsed, trial_conditions=criteria["conditions"], criteria=criteria
         )
 
         cond = self._score_conditions(patient, patient_db, criteria["conditions"], trial_icd10)

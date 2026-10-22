@@ -164,6 +164,20 @@ class TrialMatchOrchestrator:
         min_age = _parse_age(eligibility.get("minimumAge"))
         max_age = _parse_age(eligibility.get("maximumAge"))
 
+        elig_text = eligibility.get("eligibilityCriteria", "")
+        if min_age is None or max_age is None:
+            # Fallback extraction from eligibilityCriteria text
+            range_match = re.search(r"(?:ages?|age)?\s*(\d+)\s*(?:to|-)\s*(\d+)\s*(?:years?|yrs?)?", elig_text, re.IGNORECASE)
+            if range_match:
+                if min_age is None:
+                    min_age = int(range_match.group(1))
+                if max_age is None:
+                    max_age = int(range_match.group(2))
+            else:
+                older_match = re.search(r"(?:ages?|age)?\s*(\d+)\s*(?:years?)?\s*(?:and\s+older|and\s+above|\+)", elig_text, re.IGNORECASE)
+                if older_match and min_age is None:
+                    min_age = int(older_match.group(1))
+
         location_countries = payload.get("location_countries", [])
         location_cities = payload.get("location_cities", [])
 
