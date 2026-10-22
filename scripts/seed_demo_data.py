@@ -187,6 +187,11 @@ async def main():
     async with AsyncSessionLocal() as session:
         await seed_trials_if_needed(session)
         await seed_patients_if_needed(session)
+    try:
+        from scripts.seed_fhir_data import seed_fhir_patients
+        await seed_fhir_patients()
+    except Exception as e:
+        logger.warning("Could not auto-seed FHIR patients: %s", e)
     await engine.dispose()
 
 

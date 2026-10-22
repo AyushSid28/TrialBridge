@@ -447,14 +447,14 @@ with st.sidebar:
         "Data source",
         ["Kaggle (4K patients)", "FHIR (117 patients)"],
         key="data_source",
-        help="Choose the patient dataset used for screening: Kaggle contains about 4,000 patients, while FHIR contains 117 patients.",
+        help="Choose patient dataset: Kaggle (demographics & conditions in flat schema) or FHIR (117 standardized clinical patients).",
     )
     source_val = "fhir" if "FHIR" in data_source else "kaggle"
     st.markdown(f"""
     <div style="margin-top: 2rem; padding: 0.8rem; background: {_SURFACE}; border: 1px solid {_BORDER};
                 border-radius: 8px; font-size: 0.72rem; color: {_TEXT_DIM}; line-height: 1.6;">
         <strong style="color:{_TEXT};">About</strong><br>
-        TrialBridge matches patients to clinical trials using eligibility rules. Select a trial or describe criteria in plain language to score and rank candidates.
+        TrialBridge matches patients to clinical trials using eligibility rules. Select a trial from the catalog to score and rank candidate patients.
     </div>
     """, unsafe_allow_html=True)
 
@@ -472,52 +472,27 @@ st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 
 # ── Input ────────────────────────────────────────────────────────────────
 
-mode_col = st.columns([1])[0]
-with mode_col:
-    input_mode = st.radio(
-        "Input mode",
-        ["Select Trial", "Custom Input"],
-        horizontal=True,
-        key="score_mode",
-        help="Select a listed clinical trial, or describe patient eligibility criteria in plain language.",
+oc1, oc2 = st.columns([3, 1])
+trial_labels = list(TRIAL_OPTIONS.keys())
+if not trial_labels:
+    oc1.error(
+        f"No trials available. Expected {VALID_TRIALS_PATH.name} in data/."
     )
-
-if input_mode == "Select Trial":
-    oc1, oc2 = st.columns([3, 1])
-    trial_labels = list(TRIAL_OPTIONS.keys())
-    if not trial_labels:
-        oc1.error(
-            f"No trials available. Expected {VALID_TRIALS_PATH.name} in data/ "
-            "- use Custom Input instead, or restore the file."
-        )
-        score_trial_id = ""
-    else:
-        label = oc1.selectbox(
-            "Clinical trial",
-            options=trial_labels,
-            index=min(DEFAULT_TRIAL_IDX, len(trial_labels) - 1),
-            key="score_trial_select",
-            help="Choose the clinical trial whose eligibility criteria will be used to score and rank patients.",
-        )
-        score_trial_id = TRIAL_OPTIONS.get(label, "")
-    score_limit = oc2.slider(
-        "Max patients", 10, 500, 200,
-        key="score_limit",
-        help="Set the maximum number of patients to score for the selected trial. Higher limits may take longer.",
-    )
+    score_trial_id = ""
 else:
-    search_query = st.text_area(
-        "Describe patient criteria in plain language",
-        placeholder="e.g. elderly women with heart problems and high BMI, diabetic patients over 50...",
-        height=100,
-        key="score_query",
-        help="Describe the target patients, including relevant conditions, age, sex, BMI, smoking status, or other eligibility requirements.",
+    label = oc1.selectbox(
+        "Clinical trial",
+        options=trial_labels,
+        index=min(DEFAULT_TRIAL_IDX, len(trial_labels) - 1),
+        key="score_trial_select",
+        help="Choose the clinical trial whose eligibility criteria will be used to score and rank patients.",
     )
-    score_limit = st.slider(
-        "Max patients", 10, 500, 200,
-        key="score_limit_crit",
-        help="Set the maximum number of patients to score against your custom criteria. Higher limits may take longer.",
-    )
+    score_trial_id = TRIAL_OPTIONS.get(label, "")
+score_limit = oc2.slider(
+    "Max patients", 10, 500, 200,
+    key="score_limit",
+    help="Set the maximum number of patients to score for the selected trial. Higher limits may take longer.",
+)
 
 score_btn = st.button("Run Scoring", type="primary", key="score_btn", use_container_width=False)
 
@@ -531,27 +506,24 @@ if not score_btn:
             Ready to screen patients
         </div>
         <div style="font-size: 0.85rem; color: {_TEXT_DIM}; line-height: 1.6; margin-bottom: 1.5rem;">
-            Select a clinical trial or describe your criteria above, then hit
+            Select a clinical trial above, then hit
             <strong style="color:{_ACCENT};">Run Scoring</strong> to match and rank patients.
         </div>
         <div style="display: flex; justify-content: center; gap: 2rem; font-size: 0.75rem; color: {_TEXT_DIM};">
-            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">1️⃣</span>Choose input</div>
-            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">2️⃣</span>Set criteria</div>
-            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">3️⃣</span>Run scoring</div>
+            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">1️⃣</span>Select Trial</div>
+            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">2️⃣</span>Set Patient Limit</div>
+            <div><span style="display:block; font-size:1.2rem; margin-bottom:0.25rem;">3️⃣</span>Run Scoring</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 if score_btn:
     data = None
-    if input_mode == "Select Trial" and score_trial_id:
+    if score_trial_id:
         with st.spinner("Scoring patients..."):
             data = api_post("score-patients", {"trial_id": score_trial_id, "limit": score_limit, "source": source_val})
-    elif input_mode == "Custom Input" and search_query and search_query.strip():
-        with st.spinner("Interpreting criteria and scoring..."):
-            data = api_post("score-patients-criteria", {"search_query": search_query.strip(), "limit": score_limit, "source": source_val})
     else:
-        st.warning("Provide a trial or criteria before scoring.")
+        st.warning("Please select a clinical trial before scoring.")
 
     if data:
         summary = data["summary"]
