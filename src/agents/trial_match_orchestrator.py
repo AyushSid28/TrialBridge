@@ -106,11 +106,49 @@ class TrialMatchOrchestrator:
             {"tid": trial_id},
         )
         row = result.fetchone()
-        if not row:
-            return None
+        if row:
+            cols = list(result.keys())
+            return dict(zip(cols, row))
 
-        cols = list(result.keys())
-        return dict(zip(cols, row))
+        # Dynamic fallback: If not in local DB, fetch from ClinicalTrials.gov API and cache
+        clean_id = trial_id.strip().upper()
+        if clean_id.startswith("NCT"):
+            try:
+                import asyncio
+                import requests
+                from src.scrappers.us_clinical_trials_scrapping import process_trial, upsert_clinical_trial
+
+                def _fetch_api(nct: str):
+                    url = f"https://clinicaltrials.gov/api/v2/studies/{nct}"
+                    resp = requests.get(url, timeout=10)
+                    if resp.status_code == 200:
+                        return resp.json()
+                    return None
+
+                data = await asyncio.to_thread(_fetch_api, clean_id)
+                if data:
+                    doc = process_trial(data)
+                    if doc:
+                        await upsert_clinical_trial(self.session, doc)
+                        await self.session.flush()
+
+                        result = await self.session.execute(
+                            text("""
+                                SELECT id, nct_id, title, sponsor, status, payload
+                                FROM clinical_trials
+                                WHERE nct_id = :tid
+                                LIMIT 1
+                            """),
+                            {"tid": clean_id},
+                        )
+                        row = result.fetchone()
+                        if row:
+                            cols = list(result.keys())
+                            return dict(zip(cols, row))
+            except Exception as e:
+                logger.warning("Dynamic trial fetch failed", extra={"trial_id": trial_id, "error": str(e)})
+
+        return None
 
     def extract_criteria(self, trial: dict) -> dict:
         payload = trial.get("payload", {})
@@ -125,6 +163,20 @@ class TrialMatchOrchestrator:
         sex = eligibility.get("sex", "ALL")
         min_age = _parse_age(eligibility.get("minimumAge"))
         max_age = _parse_age(eligibility.get("maximumAge"))
+
+        elig_text = eligibility.get("eligibilityCriteria", "")
+        if min_age is None or max_age is None:
+            # Fallback extraction from eligibilityCriteria text
+            range_match = re.search(r"(?:ages?|age)?\s*(\d+)\s*(?:to|-)\s*(\d+)\s*(?:years?|yrs?)?", elig_text, re.IGNORECASE)
+            if range_match:
+                if min_age is None:
+                    min_age = int(range_match.group(1))
+                if max_age is None:
+                    max_age = int(range_match.group(2))
+            else:
+                older_match = re.search(r"(?:ages?|age)?\s*(\d+)\s*(?:years?)?\s*(?:and\s+older|and\s+above|\+)", elig_text, re.IGNORECASE)
+                if older_match and min_age is None:
+                    min_age = int(older_match.group(1))
 
         location_countries = payload.get("location_countries", [])
         location_cities = payload.get("location_cities", [])

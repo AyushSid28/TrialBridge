@@ -3,38 +3,60 @@ import requests
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import html
 import json
 import os
+from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
 
-API_BASE = "http://localhost:8001/api/v1/agents"
-API_KEY = os.getenv("API_KEY", "I1yRx5ycm2uwuYR6RcNgm9HeGxiNctSe")
+load_dotenv()
+
+def _get_env_or_secret(key: str, default: str = "") -> str:
+    try:
+        if hasattr(st, "secrets") and key in st.secrets:
+            return str(st.secrets[key])
+    except Exception:
+        pass
+    return os.getenv(key, default)
+
+API_URL = _get_env_or_secret("TRIALBRIDGE_API_URL", "http://localhost:8000").rstrip("/")
+API_BASE = _get_env_or_secret("API_BASE", f"{API_URL}/api/v1/agents")
+API_KEY = _get_env_or_secret("API_KEY", "")
 API_HEADERS = {"X-API-Key": API_KEY}
 
-st.set_page_config(page_title="Ulalo", layout="wide", page_icon="U")
+st.set_page_config(page_title="TrialBridge", layout="wide")
 
 # ── Palette ──────────────────────────────────────────────────────────────
-_BG         = "#0C1117"
-_SURFACE    = "#141C24"
-_SURFACE_HI = "#1B2530"
-_BORDER     = "#243040"
-_TEXT        = "#D8DEE4"
-_TEXT_DIM    = "#7B8794"
-_ACCENT      = "#5A9E94"   # teal
-_ACCENT_DIM  = "#3D6E66"
-_WARM        = "#C8965A"   # amber
-_RED         = "#C06058"   # muted coral
-_GREEN       = "#5A9E6A"
+_BG         = "#0B0F17"
+_SURFACE    = "#111827"
+_SURFACE_HI = "#1E293B"
+_BORDER     = "#263548"
+_TEXT        = "#F1F5F9"
+_TEXT_DIM    = "#94A3B8"
+_ACCENT      = "#14B8A6"   # vibrant clinical teal
+_ACCENT_DIM  = "#0F766E"
+_WARM        = "#F59E0B"   # amber
+_RED         = "#F43F5E"   # rose / disqualified
+_GREEN       = "#10B981"   # emerald / eligible
 
 # ── Plotly theme ─────────────────────────────────────────────────────────
 PLOTLY_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="Figtree, sans-serif", color=_TEXT_DIM, size=12),
+    font=dict(family="Inter, sans-serif", color=_TEXT_DIM, size=12),
     margin=dict(l=0, r=0, t=32, b=0),
     xaxis=dict(gridcolor=_BORDER, zerolinecolor=_BORDER),
     yaxis=dict(gridcolor=_BORDER, zerolinecolor=_BORDER),
 )
+
+FACTOR_LABELS = {
+    "condition": "Condition",
+    "age": "Age",
+    "sex": "Sex",
+    "geography": "Geography",
+    "health": "Health",
+}
 
 # ── Load valid trial IDs ────────────────────────────────────────────────
 VALID_TRIALS_PATH = Path(__file__).resolve().parent / "data" / "valid_trial_ids.json"
@@ -52,20 +74,20 @@ TRIAL_OPTIONS = {
     for t in VALID_TRIALS
 }
 DEFAULT_TRIAL_IDX = next(
-    (i for i, t in enumerate(VALID_TRIALS) if t["nct_id"] == "NCT06230718"), 0
+    (i for i, t in enumerate(VALID_TRIALS) if t["nct_id"] == "NCT05369065"), 0
 )
 
 # ── Global styles ────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Overpass+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ---- base ---- */
 html, body, [class*="css"] {{
-    font-family: 'Figtree', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }}
 .block-container {{
-    padding-top: 2rem;
+    padding-top: 1.8rem;
     padding-bottom: 2rem;
     max-width: 1200px;
 }}
@@ -77,49 +99,63 @@ html, body, [class*="css"] {{
 h1 {{
     font-weight: 700 !important;
     letter-spacing: -0.03em !important;
-    font-size: 1.75rem !important;
+    font-size: 1.85rem !important;
     color: {_TEXT} !important;
+    background: linear-gradient(135deg, #F8FAFC 30%, #94A3B8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }}
 h2 {{
     font-weight: 600 !important;
     letter-spacing: -0.02em !important;
-    font-size: 1.2rem !important;
+    font-size: 1.25rem !important;
     color: {_TEXT} !important;
     margin-top: 1.5rem !important;
 }}
 h3 {{
     font-weight: 600 !important;
-    font-size: 1rem !important;
+    font-size: 0.82rem !important;
     color: {_TEXT_DIM} !important;
     text-transform: uppercase;
-    letter-spacing: 0.06em !important;
-    font-size: 0.75rem !important;
+    letter-spacing: 0.08em !important;
 }}
 
 /* ---- stat blocks ---- */
 .stat-row {{
-    display: flex;
-    gap: 1px;
-    background: {_BORDER};
-    border-radius: 8px;
-    overflow: hidden;
-    margin: 1rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin: 1.25rem 0;
 }}
 .stat-cell {{
-    flex: 1;
-    background: {_SURFACE};
-    padding: 1rem 1.2rem;
+    background: linear-gradient(145deg, #121926, #1A2434);
+    border: 1px solid #233142;
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
     text-align: left;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }}
-.stat-cell:first-child {{
-    border-radius: 8px 0 0 8px;
+.stat-cell:hover {{
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }}
-.stat-cell:last-child {{
-    border-radius: 0 8px 8px 0;
+.stat-cell.accent-cell {{
+    border-top: 3px solid {_ACCENT};
 }}
+.stat-cell.red-cell {{
+    border-top: 3px solid {_RED};
+}}
+.stat-cell.warm-cell {{
+    border-top: 3px solid {_WARM};
+}}
+.stat-cell.green-cell {{
+    border-top: 3px solid {_GREEN};
+}}
+
 .stat-val {{
-    font-family: 'Overpass Mono', monospace;
-    font-size: 1.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.7rem;
     font-weight: 600;
     line-height: 1.1;
     color: {_TEXT};
@@ -130,18 +166,19 @@ h3 {{
 .stat-val.green  {{ color: {_GREEN}; }}
 .stat-label {{
     font-size: 0.7rem;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: {_TEXT_DIM};
-    margin-top: 0.3rem;
+    margin-top: 0.35rem;
 }}
 
 /* ---- tag pills ---- */
 .tag {{
     display: inline-block;
-    padding: 0.15rem 0.5rem;
-    border-radius: 3px;
-    font-size: 0.72rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.74rem;
     font-weight: 500;
     letter-spacing: 0.02em;
     margin-right: 0.3rem;
@@ -150,39 +187,43 @@ h3 {{
     color: {_TEXT_DIM};
     border: 1px solid {_BORDER};
 }}
-.tag.teal {{ background: rgba(90,158,148,0.12); color: {_ACCENT}; border-color: rgba(90,158,148,0.25); }}
-.tag.warm {{ background: rgba(200,150,90,0.12); color: {_WARM}; border-color: rgba(200,150,90,0.25); }}
-.tag.red  {{ background: rgba(192,96,88,0.12); color: {_RED}; border-color: rgba(192,96,88,0.25); }}
+.tag.teal {{ background: rgba(20,184,166,0.12); color: {_ACCENT}; border-color: rgba(20,184,166,0.3); }}
+.tag.warm {{ background: rgba(245,158,11,0.12); color: {_WARM}; border-color: rgba(245,158,11,0.3); }}
+.tag.red  {{ background: rgba(244,63,94,0.14); color: {_RED}; border-color: rgba(244,63,94,0.35); }}
 
 /* ---- section divider ---- */
 .section-rule {{
     border: none;
     border-top: 1px solid {_BORDER};
-    margin: 2rem 0 1.5rem 0;
+    margin: 1.75rem 0 1.25rem 0;
 }}
 
 /* ---- criteria panel ---- */
 .criteria-panel {{
-    background: {_SURFACE};
-    border: 1px solid {_BORDER};
-    border-radius: 8px;
-    padding: 1rem 1.2rem;
-    margin: 0.75rem 0;
-    font-size: 0.85rem;
+    background: linear-gradient(135deg, rgba(18, 25, 38, 0.85), rgba(15, 23, 42, 0.7));
+    border: 1px solid rgba(38, 53, 72, 0.85);
+    border-left: 3px solid {_ACCENT};
+    border-radius: 10px;
+    padding: 1.1rem 1.35rem;
+    margin: 0.85rem 0;
+    font-size: 0.86rem;
     color: {_TEXT_DIM};
-    line-height: 1.6;
+    line-height: 1.65;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
 }}
 .criteria-panel strong {{
     color: {_TEXT};
-    font-weight: 500;
+    font-weight: 600;
 }}
 .criteria-panel code {{
-    font-family: 'Overpass Mono', monospace;
-    font-size: 0.78rem;
-    background: {_SURFACE_HI};
-    padding: 0.1rem 0.35rem;
-    border-radius: 3px;
-    color: {_ACCENT};
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    background: rgba(20, 184, 166, 0.1);
+    border: 1px solid rgba(20, 184, 166, 0.25);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    color: #2DD4BF;
 }}
 
 /* ---- patient detail panel ---- */
@@ -253,33 +294,52 @@ div[data-baseweb="radio"] label {{
     font-size: 0.85rem !important;
 }}
 button[data-baseweb="tab"] {{
-    font-size: 0.8rem !important;
-    letter-spacing: 0.03em;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em;
+    padding: 0.6rem 1.1rem !important;
+    border-radius: 6px 6px 0 0 !important;
+    transition: color 0.2s ease;
+}}
+button[data-baseweb="tab"][aria-selected="true"] {{
+    color: {_ACCENT} !important;
+    border-bottom: 2px solid {_ACCENT} !important;
 }}
 
 /* ---- button ---- */
 .stButton > button[kind="primary"] {{
-    background: {_ACCENT} !important;
+    background: linear-gradient(135deg, {_ACCENT}, {_ACCENT_DIM}) !important;
     border: none !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
     font-weight: 600 !important;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
+    padding: 0.55rem 1.5rem !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 14px rgba(20, 184, 166, 0.35);
+    transition: all 0.2s ease !important;
 }}
 .stButton > button[kind="primary"]:hover {{
-    background: {_ACCENT_DIM} !important;
+    background: linear-gradient(135deg, #0D9488, #0F766E) !important;
+    box-shadow: 0 6px 22px rgba(20, 184, 166, 0.5);
+    transform: translateY(-1px);
 }}
 
 /* ---- expander ---- */
 .streamlit-expanderHeader {{
     font-size: 0.85rem !important;
-    font-weight: 500 !important;
-    color: {_TEXT_DIM} !important;
+    font-weight: 600 !important;
+    color: {_TEXT} !important;
+    background: {_SURFACE} !important;
+    border-radius: 6px !important;
 }}
 
 /* ---- dataframe ---- */
 .stDataFrame {{
     border: 1px solid {_BORDER} !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
     overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }}
 
 /* ---- spinner ---- */
@@ -289,7 +349,7 @@ button[data-baseweb="tab"] {{
 
 /* ---- hide metric label padding ---- */
 [data-testid="stMetricValue"] {{
-    font-family: 'Overpass Mono', monospace !important;
+    font-family: 'JetBrains Mono', monospace !important;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -297,14 +357,37 @@ button[data-baseweb="tab"] {{
 
 # ── API helpers ──────────────────────────────────────────────────────────
 
+def _error_detail(resp) -> str:
+    """Pull FastAPI's `detail` out of an error response, tolerating non-JSON bodies.
+
+    Gateways and proxies return HTML or an empty body, which would make
+    resp.json() raise and mask the real status code behind a parse error.
+    """
+    try:
+        payload = resp.json()
+    except ValueError:
+        return (resp.text or "").strip()[:300] or resp.reason or "no response body"
+    if isinstance(payload, dict):
+        return str(payload.get("detail", payload))
+    return str(payload)
+
+
 def api_post(endpoint: str, payload: dict, timeout: int = 120) -> dict | None:
     try:
         resp = requests.post(f"{API_BASE}/{endpoint}", json=payload, headers=API_HEADERS, timeout=timeout)
         if resp.status_code == 200:
             return resp.json()
-        st.error(f"API {resp.status_code}: {resp.json().get('detail', resp.text)}")
+        if resp.status_code == 429:
+            retry_after = resp.headers.get("Retry-After", "")
+            wait = f" Try again in {retry_after}s." if retry_after else ""
+            st.warning(f"Rate limited by the API.{wait}")
+            return None
+        if resp.status_code == 401:
+            st.error("API rejected the key (401). Check that API_KEY matches the backend.")
+            return None
+        st.error(f"API {resp.status_code}: {_error_detail(resp)}")
     except requests.exceptions.ConnectionError:
-        st.error("Cannot connect to backend. Is uvicorn running on port 8001?")
+        st.error(f"Cannot connect to backend at {API_URL}. Is uvicorn running?")
     except Exception as e:
         st.error(f"Request failed: {e}")
     return None
@@ -316,7 +399,11 @@ def stat_row(cells: list[tuple[str, str, str]]):
     """Render a row of stat cells. Each tuple: (value, label, color_class)."""
     inner = ""
     for val, label, cls in cells:
-        inner += f'<div class="stat-cell"><div class="stat-val {cls}">{val}</div><div class="stat-label">{label}</div></div>'
+        top_cls = f"{cls}-cell" if cls else ""
+        inner += (
+            f'<div class="stat-cell {top_cls}"><div class="stat-val {cls}">{html.escape(str(val))}</div>'
+            f'<div class="stat-label">{html.escape(str(label))}</div></div>'
+        )
     st.markdown(f'<div class="stat-row">{inner}</div>', unsafe_allow_html=True)
 
 
@@ -326,11 +413,11 @@ def score_bar(name: str, score: float, max_score: float, detail: str):
     st.markdown(f"""
     <div class="score-bar-wrap">
         <div class="score-bar-header">
-            <span class="score-bar-name">{name}</span>
+            <span class="score-bar-name">{html.escape(str(name))}</span>
             <span class="score-bar-nums">{score:.1f} / {max_score:.0f}</span>
         </div>
         <div class="score-bar-track"><div class="score-bar-fill" style="width:{min(pct,100):.1f}%"></div></div>
-        <div class="score-bar-detail">{detail}</div>
+        <div class="score-bar-detail">{html.escape(str(detail))}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -343,12 +430,18 @@ def render_criteria(result):
     if llm:
         lines.append(f'<strong>Interpreted query</strong> <code>{crit["search_query"]}</code>')
         parts = []
-        if crit["sex_filter"] != "ALL":
+        if crit.get("sex_filter"):
             parts.append(f'Sex: {crit["sex_filter"]}')
         age_min = crit["age_range"]["min"]
         age_max = crit["age_range"]["max"]
-        if age_min or age_max:
-            parts.append(f'Age: {age_min or "?"}&ndash;{age_max or "?"}')
+        if age_min and age_max:
+            parts.append(f'Age: {age_min}&ndash;{age_max}')
+        elif age_min:
+            parts.append(f'Age: &ge; {age_min}')
+        elif age_max:
+            parts.append(f'Age: &le; {age_max}')
+        else:
+            parts.append('Age: All ages')
         if llm.get("min_bmi") or llm.get("max_bmi"):
             parts.append(f'BMI: {llm.get("min_bmi") or "?"}&ndash;{llm.get("max_bmi") or "?"}')
         if llm.get("smoker_status"):
@@ -360,74 +453,147 @@ def render_criteria(result):
         conds = ", ".join(crit.get("conditions", []))
         kws = ", ".join(crit.get("keywords", []))
         if conds:
-            lines.append(f'<strong>Conditions</strong> {conds}')
+            lines.append(f'<strong>Conditions</strong> {html.escape(conds)}')
         if kws:
-            lines.append(f'<strong>Keywords</strong> {kws}')
+            lines.append(f'<strong>Keywords</strong> {html.escape(kws)}')
         lines.append(f'<strong>Query</strong> <code>{crit["search_query"]}</code>')
         parts = [f'Sex: {crit["sex_filter"]}']
-        parts.append(f'Age: {crit["age_range"]["min"] or "?"}&ndash;{crit["age_range"]["max"] or "?"}')
+        a_min = crit["age_range"]["min"]
+        a_max = crit["age_range"]["max"]
+        if a_min and a_max:
+            parts.append(f'Age: {a_min}&ndash;{a_max}')
+        elif a_min:
+            parts.append(f'Age: &ge; {a_min}')
+        elif a_max:
+            parts.append(f'Age: &le; {a_max}')
+        else:
+            parts.append('Age: All ages')
         lines.append(f'<strong>Filters</strong> {" &middot; ".join(parts)}')
 
-    html = "<br>".join(lines)
-    st.markdown(f'<div class="criteria-panel">{html}</div>', unsafe_allow_html=True)
+    body = "<br>".join(lines)
+    st.markdown(f'<div class="criteria-panel">{body}</div>', unsafe_allow_html=True)
 
 
 def detail_grid(items: list[tuple[str, str]]):
     """Render a key/value detail grid."""
     inner = ""
     for key, val in items:
-        inner += f'<div class="detail-item"><div class="detail-key">{key}</div><div class="detail-value">{val}</div></div>'
+        inner += (
+            f'<div class="detail-item"><div class="detail-key">{html.escape(str(key))}</div>'
+            f'<div class="detail-value">{html.escape(str(val))}</div></div>'
+        )
     st.markdown(f'<div class="detail-grid">{inner}</div>', unsafe_allow_html=True)
 
 
+# ── Sidebar ───────────────────────────────────────────────────────────────
+
+with st.sidebar:
+    st.markdown(f"""
+    <div style="padding: 0.5rem 0 1rem 0;">
+        <span style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; color: {_TEXT};">TrialBridge</span>
+        <span style="display: inline-block; margin-left: 0.5rem; padding: 0.1rem 0.45rem; border-radius: 4px;
+                      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em;
+                      background: rgba(90,158,148,0.15); color: {_ACCENT}; border: 1px solid rgba(90,158,148,0.3);">
+            v1.0
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.82rem; line-height:1.5;">Clinical trial patient screening &amp; ranking powered by multi-agent AI pipelines.</span>', unsafe_allow_html=True)
+    st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
+    data_source = st.radio(
+        "Data source",
+        ["Kaggle (4K patients)", "FHIR (117 patients)"],
+        key="data_source",
+        help="Choose patient dataset: Kaggle (demographics & conditions in flat schema) or FHIR (117 standardized clinical patients).",
+    )
+    source_val = "fhir" if "FHIR" in data_source else "kaggle"
+    st.markdown(f"""
+    <div style="margin-top: 2rem; padding: 0.8rem; background: {_SURFACE}; border: 1px solid {_BORDER};
+                border-radius: 8px; font-size: 0.72rem; color: {_TEXT_DIM}; line-height: 1.6;">
+        <strong style="color:{_TEXT};">About</strong><br>
+        TrialBridge matches patients to clinical trials using eligibility rules. Select a trial from the catalog to score and rank candidate patients.
+    </div>
+    """, unsafe_allow_html=True)
+
 # ── Page ─────────────────────────────────────────────────────────────────
 
-st.markdown("# Ulalo")
-st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.85rem;">Patient screening for clinical trials</span>', unsafe_allow_html=True)
+if not API_KEY:
+    st.warning(
+        "No API_KEY is set. Export API_KEY to match the value the backend "
+        "expects, otherwise every request is rejected with 401."
+    )
+
+st.markdown("# TrialBridge")
+st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.85rem;">AI-Powered Clinical Trial Patient Matching Platform</span>', unsafe_allow_html=True)
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 
 # ── Input ────────────────────────────────────────────────────────────────
 
-src_col, mode_col = st.columns([1, 2])
-with src_col:
-    data_source = st.radio("Data source", ["Kaggle (4K patients)", "FHIR (117 patients)"], horizontal=True, key="data_source")
-    source_val = "fhir" if "FHIR" in data_source else "kaggle"
-with mode_col:
-    input_mode = st.radio("Input mode", ["Select Trial", "Custom Input"], horizontal=True, key="score_mode")
-
-if input_mode == "Select Trial":
-    oc1, oc2 = st.columns([3, 1])
+oc1, oc2 = st.columns([3, 1])
+trial_labels = list(TRIAL_OPTIONS.keys())
+if not trial_labels:
+    oc1.error(
+        f"No trials available. Expected {VALID_TRIALS_PATH.name} in data/."
+    )
+    score_trial_id = ""
+else:
     label = oc1.selectbox(
         "Clinical trial",
-        options=list(TRIAL_OPTIONS.keys()),
-        index=DEFAULT_TRIAL_IDX,
+        options=trial_labels,
+        index=min(DEFAULT_TRIAL_IDX, len(trial_labels) - 1),
         key="score_trial_select",
+        help="Choose the clinical trial whose eligibility criteria will be used to score and rank patients.",
     )
     score_trial_id = TRIAL_OPTIONS.get(label, "")
-    score_limit = oc2.slider("Max patients", 10, 500, 200, key="score_limit")
-else:
-    search_query = st.text_area(
-        "Describe patient criteria in plain language",
-        placeholder="e.g. elderly women with heart problems and high BMI, diabetic patients over 50...",
-        height=100,
-        key="score_query",
-    )
-    score_limit = st.slider("Max patients", 10, 500, 200, key="score_limit_crit")
+    selected_trial_info = next((t for t in VALID_TRIALS if t["nct_id"] == score_trial_id), None)
+    if selected_trial_info:
+        conds_str = ", ".join(selected_trial_info.get("conditions", [])[:3])
+        oc1.markdown(
+            f'<div style="font-size:0.79rem; color:{_TEXT_DIM}; margin-top:-0.3rem; margin-bottom:0.5rem; line-height: 1.4;">'
+            f'<strong>Protocol Scope:</strong> {html.escape(selected_trial_info.get("title", ""))} &bull; <em>Indications: {html.escape(conds_str or "General")}</em>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+score_limit = oc2.slider(
+    "Max patients", 10, 500, 200,
+    key="score_limit",
+    help="Set the maximum number of patients to score for the selected trial. Higher limits may take longer.",
+)
 
 score_btn = st.button("Run Scoring", type="primary", key="score_btn", use_container_width=False)
 
 # ── Results ──────────────────────────────────────────────────────────────
 
+if not score_btn:
+    st.markdown(f"""
+    <div style="margin: 3.5rem auto; max-width: 580px; text-align: center; padding: 2.5rem 2rem;
+                background: linear-gradient(145deg, #121926, #1A2434); border: 1px solid #233142;
+                border-radius: 16px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);">
+        <div style="font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: {_ACCENT}; margin-bottom: 0.8rem;">
+            Protocol Screening Pipeline
+        </div>
+        <div style="font-size: 1.25rem; font-weight: 700; color: {_TEXT}; margin-bottom: 0.6rem; letter-spacing: -0.02em;">
+            Ready to Screen and Rank Patients
+        </div>
+        <div style="font-size: 0.88rem; color: {_TEXT_DIM}; line-height: 1.6; margin-bottom: 2rem;">
+            Select a target clinical trial protocol above and hit
+            <strong style="color:{_ACCENT}; font-weight: 600;">Run Scoring</strong> to evaluate candidate matches against inclusion and exclusion criteria.
+        </div>
+        <div style="display: flex; justify-content: center; gap: 2.5rem; font-size: 0.78rem; color: {_TEXT_DIM};">
+            <div style="text-align: center;"><span style="display:block; font-size:1.1rem; font-weight:700; color:{_ACCENT}; margin-bottom:0.25rem;">[1]</span><span style="font-weight: 500;">Select Protocol</span></div>
+            <div style="text-align: center;"><span style="display:block; font-size:1.1rem; font-weight:700; color:{_ACCENT}; margin-bottom:0.25rem;">[2]</span><span style="font-weight: 500;">Set Cohort Size</span></div>
+            <div style="text-align: center;"><span style="display:block; font-size:1.1rem; font-weight:700; color:{_ACCENT}; margin-bottom:0.25rem;">[3]</span><span style="font-weight: 500;">Analyze &amp; Score</span></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
 if score_btn:
     data = None
-    if input_mode == "Select Trial" and score_trial_id:
+    if score_trial_id:
         with st.spinner("Scoring patients..."):
             data = api_post("score-patients", {"trial_id": score_trial_id, "limit": score_limit, "source": source_val})
-    elif input_mode == "Custom Input" and search_query and search_query.strip():
-        with st.spinner("Interpreting criteria and scoring..."):
-            data = api_post("score-patients-criteria", {"search_query": search_query.strip(), "limit": score_limit, "source": source_val})
     else:
-        st.warning("Provide a trial or criteria before scoring.")
+        st.warning("Please select a clinical trial before scoring.")
 
     if data:
         summary = data["summary"]
@@ -438,12 +604,22 @@ if score_btn:
         status = data.get("trial_status")
         header_parts = []
         if nct:
-            header_parts.append(f'<span class="tag teal">{nct}</span>')
+            header_parts.append(f'<span class="tag teal">{html.escape(str(nct))}</span>')
         if status:
-            header_parts.append(f'<span class="tag">{status}</span>')
-        st.markdown(f'## {title}', unsafe_allow_html=True)
+            header_parts.append(f'<span class="tag">{html.escape(str(status))}</span>')
+        run_time = datetime.now().strftime("%b %d, %Y  %H:%M")
+        header_parts.append(f'<span class="tag warm">Evaluated: {run_time}</span>')
+        st.markdown(f'## {html.escape(str(title))}', unsafe_allow_html=True)
         if header_parts:
             st.markdown(" ".join(header_parts), unsafe_allow_html=True)
+
+        crit_conds = ", ".join(data.get("criteria_used", {}).get("conditions", [])) or "target indications"
+        st.markdown(
+            f'<div style="margin: 0.6rem 0 1rem 0; padding: 0.65rem 0.95rem; border-radius: 6px; background: rgba(30, 41, 59, 0.45); border-left: 3px solid {_ACCENT}; font-size: 0.84rem; color: {_TEXT};">'
+            f'<strong>Study Objective:</strong> Evaluates therapeutic eligibility and clinical profile matching for patients presenting with {html.escape(crit_conds)}.'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
 
         # ── Key metrics ──────────────────────────────────────────────
         stat_row([
@@ -478,8 +654,51 @@ if score_btn:
                     for r in parsed["exclusion_rules"][:8]:
                         st.markdown(f"- {r}")
                 if parsed["excluded_conditions"]:
-                    excl_tags = " ".join(f'<span class="tag red">{c}</span>' for c in set(parsed["excluded_conditions"]))
+                    excl_tags = " ".join(f'<span class="tag red">{html.escape(str(c))}</span>' for c in set(parsed["excluded_conditions"]))
                     st.markdown(f"**Excluded conditions** {excl_tags}", unsafe_allow_html=True)
+
+        # ── Pipeline ─────────────────────────────────────────────────
+        pipe = data.get("pipeline") or {}
+        if pipe:
+            with st.expander("Pipeline"):
+                stage_cells = []
+                if pipe.get("stage1_ms") is not None:
+                    stage_cells.append((f'{pipe["stage1_ms"]} ms', "Text-to-SQL", ""))
+                if pipe.get("stage2_ms") is not None:
+                    stage_cells.append((f'{pipe["stage2_ms"]} ms', "Root word search", ""))
+                if pipe.get("stage3_ms") is not None:
+                    stage_cells.append((f'{pipe["stage3_ms"]} ms', "Scoring", ""))
+                if pipe.get("total_ms") is not None:
+                    stage_cells.append((f'{pipe["total_ms"]} ms', "Total", "accent"))
+                if stage_cells:
+                    stat_row(stage_cells)
+
+                flags = []
+                flags.append(
+                    f'<span class="tag teal">cache hit</span>' if pipe.get("cache_hit")
+                    else '<span class="tag">cache miss</span>'
+                )
+                flags.append(
+                    f'<span class="tag teal">pre-filter applied</span>' if pipe.get("used_prefilter")
+                    else '<span class="tag warm">pre-filter skipped</span>'
+                )
+                flags.append(
+                    f'<span class="tag">{pipe.get("text_to_sql_prefiltered", 0)} pre-filtered'
+                    f' &rarr; {pipe.get("root_word_verified", 0)} verified</span>'
+                )
+                st.markdown(" ".join(flags), unsafe_allow_html=True)
+
+                generated = pipe.get("text_to_sql_query")
+                if generated:
+                    st.markdown("**Generated SQL**")
+                    st.code(generated, language="sql")
+                else:
+                    st.markdown(
+                        f'<span style="color:{_TEXT_DIM}; font-size:0.8rem;">'
+                        "No SQL generated - the pre-filter was skipped or failed, and the "
+                        "search ran against the full table.</span>",
+                        unsafe_allow_html=True,
+                    )
 
         patients = data["scored_patients"]
         eligible_patients = [p for p in patients if not p["excluded"]]
@@ -514,6 +733,8 @@ if score_btn:
                 cats = ["Condition", "Age", "Sex", "Geography", "Health"]
                 vals = [bd["condition"]["score"], bd["age"]["score"], bd["sex"]["score"], bd["geography"]["score"], bd["health"]["score"]]
                 maxv = [bd["condition"]["max"], bd["age"]["max"], bd["sex"]["max"], bd["geography"]["max"], bd["health"]["max"]]
+                # Give the outer ring a little headroom above the largest weight.
+                radar_max = max(maxv) * 1.15 if maxv else 1
                 fig_r = go.Figure()
                 fig_r.add_trace(go.Scatterpolar(
                     r=maxv + [maxv[0]], theta=cats + [cats[0]],
@@ -529,7 +750,7 @@ if score_btn:
                     **PLOTLY_LAYOUT, height=300, showlegend=False,
                     polar=dict(
                         bgcolor="rgba(0,0,0,0)",
-                        radialaxis=dict(visible=True, range=[0, 35], gridcolor=_BORDER, color=_TEXT_DIM, tickfont=dict(size=10)),
+                        radialaxis=dict(visible=True, range=[0, radar_max], gridcolor=_BORDER, color=_TEXT_DIM, tickfont=dict(size=10)),
                         angularaxis=dict(gridcolor=_BORDER, color=_TEXT_DIM),
                     ),
                 )
@@ -539,9 +760,14 @@ if score_btn:
 
         # ── Patient table ────────────────────────────────────────────
         st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
-        st.markdown("### Ranked Patients")
+        st.markdown("### Patient Evaluation")
 
-        t_elig, t_excl, t_raw = st.tabs(["Eligible", "Excluded", "Raw"])
+        excl_patients = [p for p in patients if p["excluded"]]
+        t_elig, t_excl, t_raw = st.tabs([
+            f"Eligible Candidates ({len(eligible_patients)})",
+            f"Disqualified / Excluded ({len(excl_patients)})",
+            "Raw Audit JSON",
+        ])
         with t_elig:
             if eligible_patients:
                 rows = []
@@ -569,18 +795,39 @@ if score_btn:
                     ),
                     use_container_width=True, height=450,
                 )
+                csv_data = df.to_csv(index=False).encode("utf-8")
+                st.download_button(
+                    label="Export eligible patients (CSV)",
+                    data=csv_data,
+                    file_name="eligible_patients.csv",
+                    mime="text/csv",
+                    key="download_csv",
+                )
             else:
-                st.info("No eligible patients.")
+                st.info("No eligible patients matched this trial.")
         with t_excl:
-            excl = [p for p in patients if p["excluded"]]
-            if excl:
-                st.dataframe(pd.DataFrame([{
-                    "Patient": p.get("display_patient_id") or p["patient_id"][:8],
-                    "Conditions": ", ".join(p["patient_summary"].get("conditions") or []),
-                    "Reasons": "; ".join(p["exclusion_reasons"]),
-                } for p in excl]), use_container_width=True)
+            if excl_patients:
+                st.markdown(
+                    f'<div style="padding: 0.85rem 1.1rem; border-radius: 8px; background: rgba(244,63,94,0.08); '
+                    f'border: 1px solid rgba(244,63,94,0.25); color: #FDA4AF; font-size: 0.86rem; margin-bottom: 1rem;">'
+                    f'<strong>{len(excl_patients)} candidate patients were screened and disqualified</strong> '
+                    f'based on protocol exclusion rules (contraindicated conditions, age cutoffs, or demographic constraints).'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+                excl_rows = []
+                for p in excl_patients:
+                    ps = p.get("patient_summary", {})
+                    excl_rows.append({
+                        "Patient ID": p.get("display_patient_id") or p["patient_id"][:8],
+                        "Age": ps.get("age", "?"),
+                        "Gender": ps.get("gender", "?"),
+                        "Conditions": ", ".join(ps.get("conditions") or []),
+                        "Disqualification Reasons": " • ".join(p.get("exclusion_reasons", [])),
+                    })
+                st.dataframe(pd.DataFrame(excl_rows), use_container_width=True, height=400)
             else:
-                st.markdown(f'<span style="color:{_TEXT_DIM}; font-size:0.85rem;">No patients excluded.</span>', unsafe_allow_html=True)
+                st.markdown(f'<div style="padding: 0.9rem; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid {_BORDER}; color: {_TEXT_DIM}; font-size: 0.85rem;">No candidate patients were disqualified for this trial.</div>', unsafe_allow_html=True)
         with t_raw:
             st.json(data)
 
@@ -590,7 +837,7 @@ if score_btn:
             st.markdown("### Patient Inspector")
 
             opts = {
-                f"#{i+1}  {p.get('display_patient_id', p['patient_id'][:8])}  ({p['composite_score']})": p
+                f"#{i+1}  {p.get('display_patient_id') or p['patient_id'][:8]}  ({p['composite_score']})": p
                 for i, p in enumerate(eligible_patients)
             }
             sel = opts[st.selectbox("Select patient", list(opts.keys()), key="score_patient_sel")]
@@ -613,7 +860,7 @@ if score_btn:
 
             with col_score:
                 for factor, d in sel["breakdown"].items():
-                    score_bar(factor, d["score"], d["max"], d["details"])
+                    score_bar(FACTOR_LABELS.get(factor, factor.title()), d["score"], d["max"], d["details"])
 
         # ── Footer ───────────────────────────────────────────────────
         st.markdown(f'<div style="margin-top:2rem; font-size:0.72rem; color:{_TEXT_DIM};">Audit log {data.get("audit_log_id", "N/A")}</div>', unsafe_allow_html=True)
